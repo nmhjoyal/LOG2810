@@ -15,7 +15,7 @@ class CLSC(Enum):
     Faubourgs = 12
     Plateau_Mont_Royal = 13
     Olivier_Guimond = 14
-    Hochelage_Maisonneuve = 15
+    Hochelaga_Maisonneuve = 15
     Rosemont = 16
     Côte_des_Neiges = 17
     Métro = 18
@@ -44,7 +44,6 @@ class Sommet:
         return str(CLSC(self.identifiant).name.replace("_","-"))
 
 class Vehicule:
-
     def __init__(self, typeAmbulance):
         self.type = typeAmbulance
         self.batterie = 100
@@ -52,38 +51,58 @@ class Vehicule:
         self.consommationHoraire = []
         
         #Definit la consommation horaire dependamment du type
-        #0 = NI-NH
-        if(type==0):
+        #0 = NI-MH
+        if(self.type==0):
             self.consommationHoraire=[6,12,48]
         #1 = LI-Ion
         else:
             self.consommationHoraire=[5, 10, 30]
 
     def parcourirChemin(self, etiquetteSommet, categoriePatient):
-            self.batterie -= etiquetteSommet[1]*(self.consommationHoraire[categoriePatient]/60)            
-            if self.batterie > 20:
-                print("Parcours suffisamment court, we gud")
-                return self.batterie
-            else: 
-                print("Parcours trop long")
-                return self.batterie
+        consommationParMinute = self.consommationHoraire[categoriePatient]/60
         
+        self.batterie -= sum(etiquetteSommet[1])*consommationParMinute
+        #Vérifier si le véhicule peut faire le trajet sans batteries    
+        if self.batterie > 20:
+            print("Parcours suffisamment court, we gud")
+            self.tempsParcouru = sum(etiquetteSommet[1])
+        else:
+            #On reinitialise batterie a 100 pour refaire le trajet complet avec recharges
+            self.batterie = 100
+
+            #Parcour chaque Arete
+            for i in range(len(etiquetteSommet[1])):
+                print (self.batterie)
+                print (etiquetteSommet[1][i])
+                print(consommationParMinute)
+                print(round(etiquetteSommet[1][i]*consommationParMinute))
+                self.batterie -= etiquetteSommet[1][i]*consommationParMinute
+                self.tempsParcouru += etiquetteSommet[1][i]
+
+                if ((i+1 <= len(etiquetteSommet)) and etiquetteSommet[2][i+1].borne == 1) and \
+                (self.batterie - (sum(etiquetteSommet[1],i+1)*consommationParMinute) < 20):
+                    self.batterie = 100
+                    self.tempsParcouru += 120
+
+                elif (self.batterie < 20):
+                    print("Peut pas recharger, autre chemin ou vehicule")
+                    return False
+
+            return True
+
+
 
 class Graphe:
 
     def __init__(self, nomFichier):
         self.listeSommets = []
         self.matriceArete = []
-        
         self.creerGraphe(nomFichier, 1)
     
     #Fonction qui crée une matrice contenant les relation entre chaque CLSC 
     #et la distance qui les sépare
     def creerGraphe(self, nomFichier, numeroSommet):
-        try:
-            f = open(nomFichier, "r")
-        except FileNotFoundError:
-            raise FileNotFoundError
+        f = open(nomFichier, "r")
 
         #Arriver a la fin de la première partie en gardant la dernière valeur
         #Afin de connaître la grandeur du tableau a initialiser et initialise
@@ -93,13 +112,7 @@ class Graphe:
                 break
             else:                    
                 info = ligne.split(",")
-                if int(info[0]) == numeroSommet:
-                    n = numeroSommet - len(self.listeSommets)
-                    if (n > 0):
-                        for i in (range(n)):
-                            self.listeSommets.append(None)
-                    if self.listeSommets[numeroSommet-1] == None:
-                        self.listeSommets[numeroSommet-1] = Sommet(numeroSommet, info[1])
+                self.listeSommets.append(Sommet(int(info[0]), int(info[1])))
 
         #Initialisation de la matrice avec la taille necessaire si elle n'existe pas deja
         if len(self.matriceArete) == 0:
@@ -112,17 +125,11 @@ class Graphe:
             nd1 = int(noeuds[0])
             nd2 = int(noeuds[1])
             dist = int(noeuds[2])
-
-            if self.matriceArete[nd1-1][nd2-1] == None or self.matriceArete[nd2-1][nd1-1] == None:
-                nouvelleArete = Arete(dist)
-                if nd1 == numeroSommet:  
-                    self.matriceArete[nd1-1][nd2-1]=nouvelleArete
-                    self.matriceArete[nd2-1][nd1-1]=nouvelleArete     
-                    self.creerGraphe(nomFichier, nd2)
-                elif nd2 == numeroSommet:
-                    self.matriceArete[nd1-1][nd2-1]=nouvelleArete
-                    self.matriceArete[nd2-1][nd1-1]=nouvelleArete
-                    self.creerGraphe(nomFichier, nd1)              
+            nouvelleArete = Arete(dist)
+            self.matriceArete[nd1-1][nd2-1]=nouvelleArete
+            self.matriceArete[nd2-1][nd1-1]=nouvelleArete    
+        
+        f.close()
 
     #Afficher le graphe selon les spécifications
     def lireGraphe(self):
@@ -136,7 +143,7 @@ class Graphe:
             #Itère au travers de chaque Arete et affiche le CLSC relié et la longueur
             for j in self.matriceArete[i.identifiant-1]:
                 if j != None:
-                    txt+= "(" + str(k) + " " + str(CLSC(k).name.replace("_","-")) + ", "+ str(j.longueur) + "),"
+                    txt+= "(" + str(CLSC(k).name.replace("_","-")) + ", "+ str(j.longueur) + " mins),"
                 k += 1    
             txt = txt[:-1]
             txt += "))"
@@ -147,7 +154,7 @@ class Graphe:
         
         etiquettesSommets = []
         sommetsSousGraphe= []
-        infini = 999999    
+        infini = 9999999999    
         sommetCourant = 0          
         
         #Remplissage de la liste avec les étiquettes désirées
@@ -155,9 +162,9 @@ class Graphe:
         #et [arrondissement, 0, [arrondissement]] pour l'origine
         for i in range(len(self.listeSommets)):
             if not i+1 == origine:
-                etiquettesSommets.append([self.listeSommets[i],infini, []])
+                etiquettesSommets.append([self.listeSommets[i],[infini], []])
             else:
-                etiquettesSommets.append([self.listeSommets[i],0, [i+1]])          
+                etiquettesSommets.append([self.listeSommets[i],[0], [self.listeSommets[i]]])          
 
         #Tant que le sommet désiré n'est pas atteint ou que le sous-graphe n'est pas plein, on continue
         while (not(destination in sommetsSousGraphe) and len(sommetsSousGraphe) <= len(self.listeSommets)):
@@ -165,44 +172,45 @@ class Graphe:
             
             #On trouve le sommet de distance minimale par rapport à l'origine
             for j in range(len(etiquettesSommets)):
-                if (etiquettesSommets[j][1] < plusPetiteDistance) and not(etiquettesSommets[j][0].identifiant in sommetsSousGraphe):
-                    plusPetiteDistance = etiquettesSommets[j][1]
-                    sommetCourant = etiquettesSommets[j][0].identifiant
+                if (sum(etiquettesSommets[j][1]) < plusPetiteDistance) and not(etiquettesSommets[j][0].identifiant in sommetsSousGraphe):
+                    plusPetiteDistance = sum(etiquettesSommets[j][1])
+                    sommetCourant = int(etiquettesSommets[j][0].identifiant)
                 
             sommetsSousGraphe.append(sommetCourant)
             indice = 0
             #On met à jour les étiquettes des sommets reliés au sommet courant 
             #s'il y a changement à faire
             for j in self.matriceArete[sommetCourant-1]:
-                
                 #S'il n'y a pas d'arete qui connecte les 2 sommets, on ne modifie pas l'étiquette
                 if j is not None:                    
                     #Si la distance par le nouveau chemin est plus petite, on met à jour l'étiquette
-                    if etiquettesSommets[sommetCourant-1][1] + j.longueur < etiquettesSommets[indice][1]:
-                        etiquettesSommets[indice][1] = etiquettesSommets[sommetCourant-1][1] + j.longueur
+                    if sum(etiquettesSommets[sommetCourant-1][1]) + j.longueur < sum(etiquettesSommets[indice][1]):
+                        etiquettesSommets[indice][1] = etiquettesSommets[sommetCourant-1][1].copy()
+                        etiquettesSommets[indice][1].append(j.longueur)
                         etiquettesSommets[indice][2] = etiquettesSommets[sommetCourant-1][2].copy()
-                        etiquettesSommets[indice][2].append(indice+1)
+                        etiquettesSommets[indice][2].append(self.listeSommets[indice])
                 indice+=1
         
         v = Vehicule(0)
-        batterieRestante = v.parcourirChemin(etiquettesSommets[destination-1], 2)
-        
-        #Affichage de toutes les informations demandees sur le véhicule
-        print("Type de véhicule utilisé: ", end ="")
-        if (v.type==0):
-            print("NI-NH")
-        else: 
-            print("LI-ion")
-        print ("Pourcentage final dans les batteries: ", end="")
-        print (batterieRestante)
-        print ("Chemin utilisé: ", end="")
+        reussite = v.parcourirChemin(etiquettesSommets[destination-1], categoriePatient)
 
-        chemin = ""
-        for i in etiquettesSommets[destination-1][categoriePatient]:
-            chemin += str(i) + "->"        
-        chemin = chemin[:-2]
-        print(chemin)
-        
-
-        #A RETOURNER : type vehicule utilise (NI-NH ou LI-ion)
-        #  % energie final, +court chemin, longueur en minutes,  si refusé : message excuse
+        if reussite:
+            #Affichage de toutes les informations demandees sur le véhicule
+            print("Type de véhicule utilisé: ", end ="")
+            
+            if (v.type==0):
+                print("NI-MH")
+            else: 
+                print("LI-ion")
+            print ("Pourcentage final dans les batteries: {:0.2f}%".format(v.batterie))
+            
+            print ("Chemin utilisé: ", end="")
+            chemin = ""
+            for i in etiquettesSommets[destination-1][categoriePatient]:
+                chemin += str(i.identifiant) + "\u2192 "        
+            chemin = chemin[:-2]
+            print(chemin)
+            print ("Durée du chemin: {:} minutes ".format(v.tempsParcouru), end="")
+        else:
+            print(v.batterie)
+            print("nope")
