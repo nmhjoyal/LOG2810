@@ -80,8 +80,10 @@ class Graphe:
     #Fonction qui crée une matrice contenant les relation entre chaque CLSC 
     #et la distance qui les sépare
     def creerGraphe(self, nomFichier, numeroSommet):
-        
-        f = open(nomFichier, "r")
+        try:
+            f = open(nomFichier, "r")
+        except FileNotFoundError:
+            raise FileNotFoundError
 
         #Arriver a la fin de la première partie en gardant la dernière valeur
         #Afin de connaître la grandeur du tableau a initialiser et initialise
