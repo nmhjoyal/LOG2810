@@ -1,7 +1,5 @@
 import array as arr
-from ClassesGraphe import Graphe
-import Vehicule
-import Arbre
+from classes import Graphe
 
 POINT_MAX = 29
 POINT_MIN = 1
@@ -29,9 +27,9 @@ def main():
             nomFichier = input("\nVeuillez entrer le nom du fichier contenant la carte voulue (extension .txt)\n")
             ouvrirFichierReussi = False
             #Redemande le nom d'un fichier tant qu'on trouve pas un fichier correspondant
-            while(not(ouvrirFichierReussi)):
+            while(not(ouvrirFichierReussi)): 
                 try:
-                    g = ClassesGraphe(nomFichier)
+                    g = Graphe(nomFichier)
                     # ** Il faudra peut-être réinitialiser les variables globales POINT_MAX et POINT_MIN **
 
                     ouvrirFichierReussi = True
@@ -70,38 +68,17 @@ def main():
                     
         elif(choix == "C"):
             strPoint = input("\nVeuillez entrer le point de départ\n")
-            donneesCorrectes = False
+            donneeCorrecte = False
 
-            #Redemande le point
-            while(not(donneesCorrectes)):
+            #Redemande le point 
+            while(not(donneeCorrecte)):
                 try:
                     point = int(strPoint)
 
                     #Vérifie si le point se situe sur la carte
                     if(point >= POINT_MIN and point <= POINT_MAX):
-
-                        vehicule = input("\nVeuillez entrer le type d'ambulance\n")
-                        vehicule = vehicule.upper()
-                        if vehicule == "NI-NH" or vehicule == " LI-ION":
-                            donneesCorrectes = True
-                            if vehicule == "NI-NH":
-                                objVehicule = Vehicule(0)
-                            else:
-                                objVehicule = Vehicule(1)
-                            etatPatient = input("\nVeuillez entrer l'état du patient, soit : \n1 - faible risque,\n2 - risque moyen,\n3 - haut risque.\n")
-                            etat = int(etatPatient)
-                            etiquettesSommets = [point, 0, []]
-                            cheminMax = [point, 0, []]
-                            etiquettesSommets[2].append(point)
-                            g.extraireSousGraphe(point, etiquettesSommets, objVehicule, etat - 1, cheminMax)
-                            print("\nChemin le plus long sur une charge :\n")
-                            output = ""
-                            for point in etiquettesSommets[2]:
-                                output += str(point)
-                                output += " -> "
-                            print(output[:-4] + "\n" + "Longueur : " + str(len(etiquettesSommets[2]) - 1))
-                        else:
-                            print("\nType d'ambulance invalide, veuillez rentrer les données\n")
+                        donneeCorrecte = True
+                        #g.extraireSousGraphe(point)
                     else:
                         strPoint = input("\nPoint ne se situe pas dans la carte, veuillez entrer un nouveau point de départ\n")
 
