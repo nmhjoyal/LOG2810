@@ -7,92 +7,98 @@ POINT_MIN = 1
 def main():
     #Initialisation du graphe et choix
     g = Graphe("centresLocaux.txt")
-    g.plusCourtChemin(22,27,2)
+    
+    # for i in range(1,30):
+    #     for j in range(1,30):
+    #         if j is not i:
+    #             print("i:{:}, j:{:}".format(i,j))
+    #             g.plusCourtChemin(i,j,2)
 
-    # choix = ""
-    # print("Veulliez sélectionner une option ci-dessous (ex. entrer 'A' sur le clavier pour mettre à jour la carte")
 
-    # #INTERFACE
-    # #Menu principal, se réaffiche tant que l'usager ne rentre pas la lettre 'D'
-    # while(not(choix == "D")):
-    #     choix = input("/--------------------------MENU--------------------------/ "
-    #           "\n(A) Mettre à jour la carte."
-    #           "\n(B) Déterminer le plus court chemin sécuritaire."
-    #           "\n(C) Extraire sous-graphe."
-    #           "\n(D) Quitter. \n")
+    choix = ""
+    print("Veuillez sélectionner une option ci-dessous (ex. entrer 'A' sur le clavier pour mettre à jour la carte")
 
-    #     #Convertir en majuscule
-    #     choix = choix.upper()
-    #     if(choix == "A"):
-    #         nomFichier = input("\nVeuillez entrer le nom du fichier contenant la carte voulue (extension .txt)\n")
-    #         ouvrirFichierReussi = False
-    #         #Redemande le nom d'un fichier tant qu'on trouve pas un fichier correspondant
-    #         while(not(ouvrirFichierReussi)): 
-    #             try:
-    #                 g = Graphe(nomFichier)
-    #                 # ** Il faudra peut-être réinitialiser les variables globales POINT_MAX et POINT_MIN **
+    #INTERFACE
+    #Menu principal, se réaffiche tant que l'usager ne rentre pas la lettre 'D'
+    while(not(choix == "D")):
+        choix = input("/--------------------------MENU--------------------------/ "
+              "\n(A) Mettre à jour la carte."
+              "\n(B) Déterminer le plus court chemin sécuritaire."
+              "\n(C) Extraire sous-graphe."
+              "\n(D) Quitter. \n")
 
-    #                 ouvrirFichierReussi = True
-    #             #Affiche une erreur si nom du fichier n'existe pas
-    #             except FileNotFoundError:
-    #                 nomFichier = input("\nNom de fichier erroné, veuillez entrer le nom du fichier\n")
-    #                 ouvrirFichierReussi = False
+        #Convertir en majuscule
+        choix = choix.upper()
+        if(choix == "A"):
+            nomFichier = input("\nVeuillez entrer le nom du fichier contenant la carte voulue (extension .txt)\n")
+            ouvrirFichierReussi = False
+            #Redemande le nom d'un fichier tant qu'on trouve pas un fichier correspondant
+            while(not(ouvrirFichierReussi)): 
+                try:
+                    g = Graphe(nomFichier)
+                    # ** Il faudra peut-être réinitialiser les variables globales POINT_MAX et POINT_MIN **
 
-    #         g.lireGraphe()
-    #         print("\nGraphe mis à jour\n")
+                    ouvrirFichierReussi = True
+                #Affiche une erreur si nom du fichier n'existe pas
+                except FileNotFoundError:
+                    nomFichier = input("\nNom de fichier erroné, veuillez entrer le nom du fichier\n")
+                    ouvrirFichierReussi = False
 
-    #     elif(choix == "B"):
-    #         strA = input("\nVeuillez entrer le point de départ\n")
-    #         strB = input("\nVeuillez entrer le point d'arrivée\n")
-    #         donneesCorrectes = False
+            g.lireGraphe()
+            print("\nGraphe mis à jour\n")
 
-    #         #Redemande les points si les donnees entrées sont erronées
-    #         while (not(donneesCorrectes)):
-    #             try:
-    #                 pointA = int(strA)
-    #                 pointB = int(strB)
+        elif(choix == "B"):
+            strA = input("\nVeuillez entrer le point de départ: ")
+            strB = input("\nVeuillez entrer le point d'arrivée: ")
+            donneesCorrectes = False
 
-    #                 #Vérifie si les points se situent sur la carte
-    #                 if(pointA >= POINT_MIN and pointA <= POINT_MAX and pointB >= POINT_MIN and pointB <= POINT_MAX):
-    #                     donneesCorrectes = True
-    #                     #g.plusCourtChemin(pointA, pointB, 2)
-    #                 else:
-    #                     strA = input("\nPoints ne se situent pas dans la carte, veuillez entrer un nouveau point de départ\n")
-    #                     strB = input("\nVeuillez entrer le point d'arrivée\n")
+            #Redemande les points si les donnees entrées sont erronées
+            while (not(donneesCorrectes)):
+                try:
+                    pointA = int(strA)
+                    pointB = int(strB)
 
-    #             #Si l'usager rentre des points dans un format erroné (ex. un mot)
-    #             except ValueError:
-    #                 print("\nDonnées erronées, veuillez entrer les points par leur nombre correspondant\n")
-    #                 strA = input("\nVeuillez entrer le point de départ\n")
-    #                 strB = input("\nVeuillez entrer le point d'arrivée\n")
+                    #Vérifie si les points se situent sur la carte
+                    if(pointA >= POINT_MIN and pointA <= POINT_MAX and pointB >= POINT_MIN and pointB <= POINT_MAX):
+                        donneesCorrectes = True
+                        g.plusCourtChemin(pointA, pointB, 2)
+                    else:
+                        strA = input("\nPoints ne se situent pas dans la carte, veuillez entrer un nouveau point de départ: ")
+                        strB = input("\nVeuillez entrer le point d'arrivée: ")
+
+                #Si l'usager rentre des points dans un format erroné (ex. un mot)
+                except ValueError:
+                    print("\nDonnées erronées, veuillez entrer les points par leur nombre correspondant\n")
+                    strA = input("\nVeuillez entrer le point de départ: ")
+                    strB = input("\nVeuillez entrer le point d'arrivée: ")
                     
-    #     elif(choix == "C"):
-    #         strPoint = input("\nVeuillez entrer le point de départ\n")
-    #         donneeCorrecte = False
+        elif(choix == "C"):
+            strPoint = input("\nVeuillez entrer le point de départ: ")
+            donneeCorrecte = False
 
-    #         #Redemande le point 
-    #         while(not(donneeCorrecte)):
-    #             try:
-    #                 point = int(strPoint)
+            #Redemande le point 
+            while(not(donneeCorrecte)):
+                try:
+                    point = int(strPoint)
 
-    #                 #Vérifie si le point se situe sur la carte
-    #                 if(point >= POINT_MIN and point <= POINT_MAX):
-    #                     donneeCorrecte = True
-    #                     #g.extraireSousGraphe(point)
-    #                 else:
-    #                     strPoint = input("\nPoint ne se situe pas dans la carte, veuillez entrer un nouveau point de départ\n")
+                    #Vérifie si le point se situe sur la carte
+                    if(point >= POINT_MIN and point <= POINT_MAX):
+                        donneeCorrecte = True
+                        #g.extraireSousGraphe(point)
+                    else:
+                        strPoint = input("\nPoint ne se situe pas dans la carte, veuillez entrer un nouveau point de départ: ")
 
-    #             #Si l'usager rentre des points dans un format erroné (ex. un mot)
-    #             except ValueError:
-    #                 strPoint = input("\nDonnée erronée, veuillez entrer le point par son nombre correspondant\n")
-    #         print("Extraire un sous-graphe")
+                #Si l'usager rentre des points dans un format erroné (ex. un mot)
+                except ValueError:
+                    strPoint = input("\nDonnée erronée, veuillez entrer le point par son nombre correspondant: ")
+            print("Extraire un sous-graphe")
 
-    #     elif(choix == "D"):
-    #         #Casse la boucle aussitôt que 'D' choisi
-    #         break
-    #     else:
-    #         #Si l'usager rentre autre chose que A, B, C ou D
-    #         print("Option invalide. Veuillez choisir une des options suivantes: \n")
+        elif(choix == "D"):
+            #Casse la boucle aussitôt que 'D' choisi
+            break
+        else:
+            #Si l'usager rentre autre chose que A, B, C ou D
+            print("Option invalide. Veuillez choisir une des options suivantes: \n")
 
     
 
