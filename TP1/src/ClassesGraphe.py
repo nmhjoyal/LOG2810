@@ -1,35 +1,46 @@
-import Vehicule
-import CLSC
+from Vehicule import Vehicule
+from CLSC import CLSC
+from Arbre import Arbre
 
+# Classe Arete
+#   longueur : représente la longueur entre deux sommets (en minutes)
 class Arete:
     def __init__(self, longueur):
-        self.longueur=longueur
+        self.longueur = longueur
 
 
+# Classe Sommet
+#   identifiant : représente le sommet (1, 2, ..., 29)
+#   borne : 1 si il y a une borne de recherge au sommet correspondant, 0 sinon
 class Sommet:
     def __init__(self, identifiant, borne):
-        self.identifiant=identifiant
-        self.borne=borne
+        self.identifiant = identifiant
+        self.borne = borne
 
     def obtenirNomSommet(self):
         return str(CLSC(self.identifiant).name.replace("_","-"))
 
 
+# Classe Graphe
+#   listeSommets : représente la liste de sommets
+#   matriceArete : représente la matrice des arcs du graphe. Si la valeur à la position [i, j]
+#                  est non-nulle, les sommets i + 1 et j + 1 sont reliés avec la distance correspondante
 class Graphe:
 
+    # Initialisation à partir d'un nom de fichier
     def __init__(self, nomFichier):
         self.listeSommets = []
         self.matriceArete = []
         self.creerGraphe(nomFichier, 1)
 
-    #Fonction qui crée une matrice contenant les relation entre chaque CLSC
-    #et la distance qui les sépare
+    # Fonction qui crée une matrice contenant les relation entre chaque CLSC
+    # et la distance qui les sépare
     def creerGraphe(self, nomFichier, numeroSommet):
         f = open(nomFichier, "r")
 
-        #Arriver a la fin de la première partie en gardant la dernière valeur
-        #Afin de connaître la grandeur du tableau a initialiser et initialise
-        #le sommet.
+        # Arriver a la fin de la première partie en gardant la dernière valeur
+        # Afin de connaître la grandeur du tableau a initialiser et initialise
+        # le sommet.
         for ligne in f:
             if ligne == "\n":
                 break
@@ -37,33 +48,33 @@ class Graphe:
                 info = ligne.split(",")
                 self.listeSommets.append(Sommet(int(info[0]), int(info[1])))
 
-        #Initialisation de la matrice avec la taille necessaire si elle n'existe pas deja
+        # Initialisation de la matrice avec la taille necessaire si elle n'existe pas deja
         if len(self.matriceArete) == 0:
             self.matriceArete = [[None for x in range(int(info[0]))] for y in range(int(info[0]))]
 
-        #Iteration au travers de la deuxième partie et ajout a la matrice
-        #des aretes les aretes initialises avec leur distance
+        # Iteration au travers de la deuxième partie et ajout a la matrice
+        # des aretes les aretes initialises avec leur distance
         for ligne in f:
             noeuds = ligne.split(",")
             nd1 = int(noeuds[0])
             nd2 = int(noeuds[1])
             dist = int(noeuds[2])
             nouvelleArete = Arete(dist)
-            self.matriceArete[nd1-1][nd2-1]=nouvelleArete
-            self.matriceArete[nd2-1][nd1-1]=nouvelleArete
+            self.matriceArete[nd1-1][nd2-1] = nouvelleArete
+            self.matriceArete[nd2-1][nd1-1] = nouvelleArete
 
         f.close()
 
-    #Afficher le graphe selon les spécifications
+    # Afficher le graphe selon les spécifications
     def lireGraphe(self):
 
-        #Itère au travers de chaque sommet
+        # Itère au travers de chaque sommet
         for i in self.listeSommets:
             k=1
             txt=""
             txt+= "(" + i.obtenirNomSommet() + ", " + str(i.identifiant) + ", ("
 
-            #Itère au travers de chaque Arete et affiche le CLSC relié et la longueur
+            # Itère au travers de chaque Arete et affiche le CLSC relié et la longueur
             for j in self.matriceArete[i.identifiant-1]:
                 if j != None:
                     txt+= "(" + str(CLSC(k).name.replace("_","-")) + ", "+ str(j.longueur) + " mins),"
@@ -80,7 +91,7 @@ class Graphe:
         infini = 9999999999
         sommetCourant = 0
 
-        #Remplissage de la liste avec les étiquettes désirées
+        # Remplissage de la liste avec les étiquettes désirées
         #De sorte que [arondissement,infini,[]] pour les sommets autre que l'origine
         #et [arrondissement, 0, [arrondissement]] pour l'origine
         for i in range(len(self.listeSommets)):
@@ -137,3 +148,32 @@ class Graphe:
         else:
             print(v.batterie)
             print("nope")
+
+    def extraireSousGraphe(self, point, typeVehicule, etatPatient):
+
+        # On utilise la classe Arbre pour créer l'arbre de chemins simples possibles
+        # variable point étant la racine de l'arbre
+        arbre = Arbre(point)
+        arbre.fillArbre(self.listeSommets, self.matriceArete, typeVehicule, etatPatient)
+
+        # Créer liste contenant les feuilles de l'arbres uniquement
+        liste = []
+        arbre.creerListeChemins(liste)
+        maxDist = 0
+        indexMax = -1
+
+        # Trouver feuille ayant la plus grande distance (en min)
+        for i in range(len(liste)):
+            if liste[i].distance > maxDist:
+                maxDist = liste[i].distance
+                indexMax = i
+
+        # Affichage du chemin et la longueur de celui-ci en minutes
+        print("\nChemin le plus long sur une charge :\n")
+        if not indexMax == -1:
+            strChemin = []
+            liste[indexMax].afficheChemin(strChemin)
+            strChemin[len(strChemin) - 1] = strChemin[len(strChemin) - 1][:-3]
+            for string in strChemin:
+                print(string, end="")
+        print("\nLongueur : " + str(maxDist) + " minutes\n")
