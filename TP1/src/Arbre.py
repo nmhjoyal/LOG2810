@@ -6,10 +6,10 @@ class Arbre:
     def __init__(self, racine):
         self.racine = NoeudArbre(racine, 0, None)
 
-    # racine est de type NoeudArbre, il appelle donc la fonction fillChildren.
-    # La fonction prend la liste de sommets et la liste d'aretes pour bâtir l'arbre.
-    def fillArbre(self, listeSommets, listeAretes, typeVehicule, etatPatient):
-        self.racine.fillChildren(listeSommets, listeAretes, typeVehicule, etatPatient)
+    # racine est de type NoeudArbre, il appelle donc la fonction remplirEnfants.
+    # La fonction prend la liste de sommets et la matrice d'aretes pour bâtir l'arbre.
+    def remplirArbre(self, listeSommets, matriceAretes, typeVehicule, etatPatient):
+        self.racine.remplirEnfants(listeSommets, matriceAretes, typeVehicule, etatPatient)
 
     # Fonction qui crée la liste des feuilles de l'arbres (les chemins les plus long)
     def creerListeChemins(self, liste):
@@ -26,40 +26,40 @@ class NoeudArbre:
         self.sommet = sommet
         self.distance = distance
         self.parent = parent
-        self.children = []
+        self.enfants = []
 
-    # Fonction prenant en paramètre la liste des sommets et la liste des arcs d'un graphe afin de
+    # Fonction prenant en paramètre la liste des sommets et la matrice des arcs d'un graphe afin de
     # bâtir l'arbre correspondant
-    def fillChildren(self, listeSommets, listeAretes, typeVehicule, etatPatient):
+    def remplirEnfants(self, listeSommets, matriceAretes, typeVehicule, etatPatient):
 
         vehicule = Vehicule(typeVehicule)
 
-        # Pour chaque element de la liste de sommets, nous vérifions qu'il existe un arc entre les sommets.
+        # Pour chaque élément de la liste de sommets, nous vérifions s'il existe un arc entre les sommets.
         for i in range(len(listeSommets)):
-            if listeAretes[self.sommet - 1][i] is not None:
+            if matriceAretes[self.sommet - 1][i] is not None:
 
                 # Avant d'ajouter l'élément à l'arbre, nous vérifions qu'il n'existe pas déjà dans le chemin simple,
                 # et que la nouvelle distance ne dépense pas plus que 80% de la batterie
-                distance = self.getDistance() + listeAretes[self.sommet - 1][i].longueur
+                distance = self.obtenirDistance() + matriceAretes[self.sommet - 1][i].longueur
                 if not self.sommetExiste(i + 1) and vehicule.parcourirCheminSansRecharge(distance, etatPatient):
-                    next = NoeudArbre(i + 1, self.distance + listeAretes[self.sommet - 1][i].longueur, self)
-                    self.children.append(next)
+                    next = NoeudArbre(i + 1, self.distance + matriceAretes[self.sommet - 1][i].longueur, self)
+                    self.enfants.append(next)
 
         # Pour chaque enfant nouvellement ajouté, nous rappelons la fonction sur ceux-ci
-        for i in range(len(self.children)):
-            distance = self.children[i].getDistance()
-            if not self.children[i].estBloque(listeSommets, listeAretes) and vehicule.parcourirCheminSansRecharge(distance, etatPatient):
-                self.children[i].fillChildren(listeSommets, listeAretes, typeVehicule, etatPatient)
+        for i in range(len(self.enfants)):
+            distance = self.enfants[i].obtenirDistance()
+            if not self.enfants[i].estBloque(listeSommets, matriceAretes) and vehicule.parcourirCheminSansRecharge(distance, etatPatient):
+                self.enfants[i].remplirEnfants(listeSommets, matriceAretes, typeVehicule, etatPatient)
 
     # Retourne la distance correspondant au Noeud
-    def getDistance(self):
+    def obtenirDistance(self):
         return self.distance
 
     # Fonction qui vérifie si chaque sommet lié au sommet courant existe déjà dans ce chemin
-    def estBloque(self, listeSommets, listeAretes):
+    def estBloque(self, listeSommets, matriceAretes):
         bloque = False
         for i in range(len(listeSommets)):
-            if listeAretes[self.sommet - 1][i] is not None:
+            if matriceAretes[self.sommet - 1][i] is not None:
                 if self.sommetExiste(i + 1):
                     bloque = True
                 else:
@@ -79,9 +79,9 @@ class NoeudArbre:
     # Fonction qui sert à créer la liste des feuilles de l'arbre
     # Utile afin de déterminer la distance la plus longue
     def creerListeChemins(self, liste):
-        if not len(self.children) == 0:
-            for i in range(len(self.children)):
-                self.children[i].creerListeChemins(liste)
+        if not len(self.enfants) == 0:
+            for i in range(len(self.enfants)):
+                self.enfants[i].creerListeChemins(liste)
         else:
             liste.append(self)
 

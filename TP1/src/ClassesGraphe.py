@@ -18,7 +18,7 @@ class Sommet:
         self.borne = borne
 
     def obtenirNomSommet(self):
-        return str(CLSC(self.identifiant).name.replace("_","-"))
+        return str(CLSC(self.identifiant).name.replace("_", "-"))
 
 
 # Classe Graphe
@@ -70,20 +70,20 @@ class Graphe:
 
         # Itère au travers de chaque sommet
         for i in self.listeSommets:
-            k=1
-            txt=""
-            txt+= "(" + i.obtenirNomSommet() + ", " + str(i.identifiant) + ", ("
+            k = 1
+            txt = ""
+            txt += "(" + i.obtenirNomSommet() + ", " + str(i.identifiant) + ", ("
 
             # Itère au travers de chaque Arete et affiche le CLSC relié et la longueur
             for j in self.matriceArete[i.identifiant-1]:
                 if j != None:
-                    txt+= "(" + str(CLSC(k).name.replace("_","-")) + ", "+ str(j.longueur) + " mins),"
+                    txt += "(" + str(CLSC(k).name.replace("_", "-")) + ", " + str(j.longueur) + " mins),"
                 k += 1
             txt = txt[:-1]
             txt += "))"
             print(txt)
 
-    #(POUR L'INSTANT) Trouve le plus court chemin qui relie 2 point
+    # (POUR L'INSTANT) Trouve le plus court chemin qui relie 2 point
     def plusCourtChemin(self, origine, destination, categoriePatient):
 
         etiquettesSommets = []
@@ -92,19 +92,19 @@ class Graphe:
         sommetCourant = 0
 
         # Remplissage de la liste avec les étiquettes désirées
-        #De sorte que [arondissement,infini,[]] pour les sommets autre que l'origine
-        #et [arrondissement, 0, [arrondissement]] pour l'origine
+        # De sorte que [arondissement,infini,[]] pour les sommets autre que l'origine
+        # et [arrondissement, 0, [arrondissement]] pour l'origine
         for i in range(len(self.listeSommets)):
             if not i+1 == origine:
-                etiquettesSommets.append([self.listeSommets[i],[infini], []])
+                etiquettesSommets.append([self.listeSommets[i], [infini], []])
             else:
-                etiquettesSommets.append([self.listeSommets[i],[0], [self.listeSommets[i]]])
+                etiquettesSommets.append([self.listeSommets[i], [0], [self.listeSommets[i]]])
 
-                #Tant que le sommet désiré n'est pas atteint ou que le sous-graphe n'est pas plein, on continue
+                # Tant que le sommet désiré n'est pas atteint ou que le sous-graphe n'est pas plein, on continue
         while (not(destination in sommetsSousGraphe) and len(sommetsSousGraphe) <= len(self.listeSommets)):
             plusPetiteDistance = infini
 
-            #On trouve le sommet de distance minimale par rapport à l'origine
+            # On trouve le sommet de distance minimale par rapport à l'origine
             for j in range(len(etiquettesSommets)):
                 if (sum(etiquettesSommets[j][1]) < plusPetiteDistance) and not(etiquettesSommets[j][0].identifiant in sommetsSousGraphe):
                     plusPetiteDistance = sum(etiquettesSommets[j][1])
@@ -112,27 +112,27 @@ class Graphe:
 
             sommetsSousGraphe.append(sommetCourant)
             indice = 0
-            #On met à jour les étiquettes des sommets reliés au sommet courant
-            #s'il y a changement à faire
+            # On met à jour les étiquettes des sommets reliés au sommet courant
+            # s'il y a changement à faire
             for j in self.matriceArete[sommetCourant-1]:
-                #S'il n'y a pas d'arete qui connecte les 2 sommets, on ne modifie pas l'étiquette
+                # S'il n'y a pas d'arete qui connecte les 2 sommets, on ne modifie pas l'étiquette
                 if j is not None:
-                    #Si la distance par le nouveau chemin est plus petite, on met à jour l'étiquette
+                    # Si la distance par le nouveau chemin est plus petite, on met à jour l'étiquette
                     if sum(etiquettesSommets[sommetCourant-1][1]) + j.longueur < sum(etiquettesSommets[indice][1]):
                         etiquettesSommets[indice][1] = etiquettesSommets[sommetCourant-1][1].copy()
                         etiquettesSommets[indice][1].append(j.longueur)
                         etiquettesSommets[indice][2] = etiquettesSommets[sommetCourant-1][2].copy()
                         etiquettesSommets[indice][2].append(self.listeSommets[indice])
-                indice+=1
+                indice += 1
 
         v = Vehicule(0)
         reussite = v.parcourirChemin(etiquettesSommets[destination-1], categoriePatient)
 
         if reussite:
-            #Affichage de toutes les informations demandees sur le véhicule
-            print("Type de véhicule utilisé: ", end ="")
+            # Affichage de toutes les informations demandees sur le véhicule
+            print("Type de véhicule utilisé: ", ends="")
 
-            if (v.type==0):
+            if v.type == 0:
                 print("NI-MH")
             else:
                 print("LI-ion")
@@ -149,12 +149,13 @@ class Graphe:
             print(v.batterie)
             print("nope")
 
+    # Fonction servant à afficher le plus long chemin à partir d'un point
     def extraireSousGraphe(self, point, typeVehicule, etatPatient):
 
         # On utilise la classe Arbre pour créer l'arbre de chemins simples possibles
         # variable point étant la racine de l'arbre
         arbre = Arbre(point)
-        arbre.fillArbre(self.listeSommets, self.matriceArete, typeVehicule, etatPatient)
+        arbre.remplirArbre(self.listeSommets, self.matriceArete, typeVehicule, etatPatient)
 
         # Créer liste contenant les feuilles de l'arbres uniquement
         liste = []

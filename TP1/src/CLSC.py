@@ -1,6 +1,8 @@
 from enum import Enum
-import copy
 
+# Classe CLCS
+# Énumération des endroits du graphe selon leur index. Facilite le retour
+# du nom de l'endroit
 class CLSC(Enum):
     Montreal_Nord =1
     Ahuntsic = 2
@@ -31,71 +33,3 @@ class CLSC(Enum):
     Pointe_saint_charles = 27
     Verdun = 28
     Saint_Henri = 29
-
-
-
-    def extraireSousGraphe(self, pointDepart, etiquettesSommets, vehicule, categoriePatient, cheminMax):
-
-        noChemin = 0
-
-        for indiceSommet in range(len(self.listeSommets)):
-            listeChemins = [noChemin, [pointDepart, 0, []]]
-            if self.matriceArete[pointDepart - 1][indiceSommet] is not None:
-                temp = copy.deepcopy(listeChemins[noChemin])
-                temp[1] += int(self.matriceArete[pointDepart - 1][indiceSommet].longueur)
-                temp[2].append(indiceSommet)
-                tempVehicule = Vehicule(vehicule.type)
-
-                currentSommet = pointDepart - 1
-                prochainSommet = indiceSommet
-
-                while tempVehicule.parcourirCheminSansRecharge(temp, categoriePatient):
-                    listeChemins[noChemin][1] += self.matriceArete[currentSommet][prochainSommet].longueur
-                    listeChemins[noChemin][2].append(prochainSommet)
-
-                    for indiceProchain in range(len(self.listeSommets)):
-                        if self.matriceArete[prochainSommet][indiceProchain] is not None:
-                            pointExisteDeja = False
-                            for point in listeChemins[noChemin][2]:
-                                if indiceProchain + 1 == point:
-                                    pointExisteDeja = True
-                                    break
-                            if not pointExisteDeja:
-                                temp = copy.deepcopy(listeChemins[noChemin])
-                                temp[1] += int(self.matriceArete[prochainSommet][indiceProchain].longueur)
-                                temp[2].append(indiceProchain)
-                                tempVehicule = Vehicule(vehicule.type)
-                                if tempVehicule.parcourirCheminSansRecharge(temp, categoriePatient):
-                                    listeChemins[noChemin][1] += self.matriceArete[currentSommet][prochainSommet].longueur
-                                    listeChemins[noChemin][2].append(prochainSommet)
-                                    noChemin += 1
-                                    listeChemins[noChemin] = copy.deepcopy(listeChemins[noChemin - 1])
-                                    prochainSommet = indiceProchain
-                                    break
-
-
-
-
-        for indiceSommet in range(len(self.listeSommets)):
-            if self.matriceArete[pointDepart - 1][indiceSommet] is not None:
-                pointExisteDeja = False
-                for point in etiquettesSommets[2]:
-                    if indiceSommet + 1 == point:
-                        pointExisteDeja = True
-                        break
-                if not pointExisteDeja:
-                    temp = copy.deepcopy(etiquettesSommets)
-                    temp[1] += int(self.matriceArete[pointDepart - 1][indiceSommet].longueur)
-                    temp[2].append(indiceSommet)
-                    tempVehicule = Vehicule(vehicule.type)
-                    if tempVehicule.parcourirCheminSansRecharge(temp, categoriePatient):
-                        etiquettesSommets[1] += int(self.matriceArete[pointDepart - 1][indiceSommet].longueur)
-                        etiquettesSommets[2].append(indiceSommet + 1)
-                        self.extraireSousGraphe(indiceSommet + 1, etiquettesSommets, vehicule, categoriePatient, cheminMax)
-                    else:
-                        if cheminMax[1] > etiquettesSommets[1]:
-                            cheminMax = copy.deepcopy(etiquettesSommets)
-                            etiquettesSommets = [pointDepart, 0, []]
-                            vehicule = Vehicule(vehicule.type)
-
-        return cheminMax
