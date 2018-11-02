@@ -1,11 +1,6 @@
 from enum import Enum
-<<<<<<< HEAD
 from decimal import Decimal
 import copy
-
-=======
-import copy
->>>>>>> 2ffcf4d5cf45e64512730f818ab5930af923a218
 
 class CLSC(Enum):
     Montreal_Nord =1
@@ -72,8 +67,7 @@ class Vehicule:
     def parcourirChemin(self, etiquetteSommet, categoriePatient):
         #Initialisation des valeurs pour parcourir le chemin
         consommationParMinute = self.consommationHoraire[categoriePatient]/60
-<<<<<<< HEAD
-                
+ 
         #Parcours chaque arete
         for i in range(len(etiquetteSommet[2])):
             tempsRestant = 0
@@ -86,8 +80,7 @@ class Vehicule:
                 tempsRestant += etiquetteSommet[1][j]
                 if etiquetteSommet[2][j].borne:
                     break
-=======
-        
+
         self.batterie -= sum(etiquetteSommet[1])*consommationParMinute
         #Vérifier si le véhicule peut faire le trajet sans batteries    
         if self.batterie > 20:
@@ -114,7 +107,6 @@ class Vehicule:
                 elif (self.batterie < 20):
                     print("Peut pas recharger, autre chemin ou vehicule")
                     return False
->>>>>>> 2ffcf4d5cf45e64512730f818ab5930af923a218
 
             #Si la batterie est au-dessus de 20, il possible de continuer le trajet
             if (self.batterie >=20):
@@ -323,7 +315,6 @@ class Graphe:
                 etiquetteOrigineVersDestination[1].append(etiquetteDepartVersDestination[1][j])
                 etiquetteOrigineVersDestination[2].append(etiquetteDepartVersDestination[2][j])
         else:
-<<<<<<< HEAD
             #Si c'est le premier parcours, l'etiquette du parcours correspond à celle du parcours le plus court
             #Entre le 1er depart et l'origine
             etiquetteOrigineVersDestination=copy.deepcopy(etiquetteDepartVersDestination)
@@ -388,7 +379,7 @@ class Graphe:
             
 
 #TODO: METTRE INFINI A NONE
-=======
+
             print(v.batterie)
             print("nope")
 
@@ -418,4 +409,3 @@ class Graphe:
                             vehicule = Vehicule(vehicule.type)
 
         return cheminMax
->>>>>>> 2ffcf4d5cf45e64512730f818ab5930af923a218
