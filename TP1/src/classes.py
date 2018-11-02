@@ -1,7 +1,11 @@
 from enum import Enum
+<<<<<<< HEAD
 from decimal import Decimal
 import copy
 
+=======
+import copy
+>>>>>>> 2ffcf4d5cf45e64512730f818ab5930af923a218
 
 class CLSC(Enum):
     Montreal_Nord =1
@@ -68,6 +72,7 @@ class Vehicule:
     def parcourirChemin(self, etiquetteSommet, categoriePatient):
         #Initialisation des valeurs pour parcourir le chemin
         consommationParMinute = self.consommationHoraire[categoriePatient]/60
+<<<<<<< HEAD
                 
         #Parcours chaque arete
         for i in range(len(etiquetteSommet[2])):
@@ -81,6 +86,35 @@ class Vehicule:
                 tempsRestant += etiquetteSommet[1][j]
                 if etiquetteSommet[2][j].borne:
                     break
+=======
+        
+        self.batterie -= sum(etiquetteSommet[1])*consommationParMinute
+        #Vérifier si le véhicule peut faire le trajet sans batteries    
+        if self.batterie > 20:
+            print("Parcours suffisamment court, we gud")
+            self.tempsParcouru = sum(etiquetteSommet[1])
+        else:
+            #On reinitialise batterie a 100 pour refaire le trajet complet avec recharges
+            self.batterie = 100
+
+            #Parcour chaque Arete
+            for i in range(len(etiquetteSommet[1])):
+                print(self.batterie)
+                print(etiquetteSommet[1][i])
+                print(consommationParMinute)
+                print(round(etiquetteSommet[1][i]*consommationParMinute))
+                self.batterie -= etiquetteSommet[1][i]*consommationParMinute
+                self.tempsParcouru += etiquetteSommet[1][i]
+
+                if ((i+1 <= len(etiquetteSommet)) and etiquetteSommet[2][i+1].borne == 1) and \
+                   (self.batterie - (sum(etiquetteSommet[1],i+1)*consommationParMinute) < 20):
+                    self.batterie = 100
+                    self.tempsParcouru += 120
+
+                elif (self.batterie < 20):
+                    print("Peut pas recharger, autre chemin ou vehicule")
+                    return False
+>>>>>>> 2ffcf4d5cf45e64512730f818ab5930af923a218
 
             #Si la batterie est au-dessus de 20, il possible de continuer le trajet
             if (self.batterie >=20):
@@ -113,6 +147,17 @@ class Vehicule:
                 chemin += str(i) + "\u2192 "        
             chemin = chemin[:-2]
             print(chemin)
+
+    def parcourirCheminSansRecharge(self, etiquetteSommet, categoriePatient):
+        consommationParMinute = self.consommationHoraire[categoriePatient]/60
+
+        self.batterie -= etiquetteSommet[1]*consommationParMinute
+
+        if self.batterie > 20:
+            self.tempsParcouru = etiquetteSommet[1]
+            return True
+        else:
+            return False
 
 
 class Graphe:
@@ -278,6 +323,7 @@ class Graphe:
                 etiquetteOrigineVersDestination[1].append(etiquetteDepartVersDestination[1][j])
                 etiquetteOrigineVersDestination[2].append(etiquetteDepartVersDestination[2][j])
         else:
+<<<<<<< HEAD
             #Si c'est le premier parcours, l'etiquette du parcours correspond à celle du parcours le plus court
             #Entre le 1er depart et l'origine
             etiquetteOrigineVersDestination=copy.deepcopy(etiquetteDepartVersDestination)
@@ -342,3 +388,34 @@ class Graphe:
             
 
 #TODO: METTRE INFINI A NONE
+=======
+            print(v.batterie)
+            print("nope")
+
+
+    def extraireSousGraphe(self, pointDepart, etiquettesSommets, vehicule, categoriePatient, cheminMax):
+
+        for indiceSommet in range(len(self.listeSommets)):
+            if self.matriceArete[pointDepart - 1][indiceSommet] is not None:
+                pointExisteDeja = False
+                for point in etiquettesSommets[2]:
+                    if indiceSommet + 1 == point:
+                        pointExisteDeja = True
+                        break
+                if not pointExisteDeja:
+                    temp = copy.deepcopy(etiquettesSommets)
+                    temp[1] += int(self.matriceArete[pointDepart - 1][indiceSommet].longueur)
+                    temp[2].append(indiceSommet)
+                    tempVehicule = Vehicule(vehicule.type)
+                    if tempVehicule.parcourirCheminSansRecharge(temp, categoriePatient):
+                        etiquettesSommets[1] += int(self.matriceArete[pointDepart - 1][indiceSommet].longueur)
+                        etiquettesSommets[2].append(indiceSommet + 1)
+                        self.extraireSousGraphe(indiceSommet + 1, etiquettesSommets, vehicule, categoriePatient, cheminMax)
+                    else:
+                        if cheminMax[1] > etiquettesSommets[1]:
+                            cheminMax = copy.deepcopy(etiquettesSommets)
+                            etiquettesSommets = [pointDepart, 0, []]
+                            vehicule = Vehicule(vehicule.type)
+
+        return cheminMax
+>>>>>>> 2ffcf4d5cf45e64512730f818ab5930af923a218

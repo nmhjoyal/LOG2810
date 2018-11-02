@@ -1,5 +1,6 @@
 import array as arr
 from classes import Graphe
+from classes import Vehicule
 
 POINT_MAX = 29
 POINT_MIN = 1
@@ -7,6 +8,7 @@ POINT_MIN = 1
 def main():
     #Initialisation du graphe et choix
     g = Graphe("centresLocaux.txt")
+<<<<<<< HEAD
     
     # for i in range(1,30):
     #     for j in range(1,30):
@@ -17,6 +19,12 @@ def main():
 
     choix = ""
     print("Veuillez sélectionner une option ci-dessous (ex. entrer 'A' sur le clavier pour mettre à jour la carte")
+=======
+    #càg.plusCourtChemin(22,27,2)
+
+    choix = ""
+    print("Veulliez sélectionner une option ci-dessous (ex. entrer 'A' sur le clavier pour mettre à jour la carte")
+>>>>>>> 2ffcf4d5cf45e64512730f818ab5930af923a218
 
     #INTERFACE
     #Menu principal, se réaffiche tant que l'usager ne rentre pas la lettre 'D'
@@ -33,7 +41,11 @@ def main():
             nomFichier = input("\nVeuillez entrer le nom du fichier contenant la carte voulue (extension .txt)\n")
             ouvrirFichierReussi = False
             #Redemande le nom d'un fichier tant qu'on trouve pas un fichier correspondant
+<<<<<<< HEAD
             while(not(ouvrirFichierReussi)): 
+=======
+            while(not(ouvrirFichierReussi)):
+>>>>>>> 2ffcf4d5cf45e64512730f818ab5930af923a218
                 try:
                     g = Graphe(nomFichier)
                     # ** Il faudra peut-être réinitialiser les variables globales POINT_MAX et POINT_MIN **
@@ -48,8 +60,13 @@ def main():
             print("\nGraphe mis à jour\n")
 
         elif(choix == "B"):
+<<<<<<< HEAD
             strA = input("\nVeuillez entrer le point de départ: ")
             strB = input("\nVeuillez entrer le point d'arrivée: ")
+=======
+            strA = input("\nVeuillez entrer le point de départ\n")
+            strB = input("\nVeuillez entrer le point d'arrivée\n")
+>>>>>>> 2ffcf4d5cf45e64512730f818ab5930af923a218
             donneesCorrectes = False
 
             #Redemande les points si les donnees entrées sont erronées
@@ -61,14 +78,22 @@ def main():
                     #Vérifie si les points se situent sur la carte
                     if(pointA >= POINT_MIN and pointA <= POINT_MAX and pointB >= POINT_MIN and pointB <= POINT_MAX):
                         donneesCorrectes = True
+<<<<<<< HEAD
                         g.plusCourtChemin(pointA, pointB, 2)
                     else:
                         strA = input("\nPoints ne se situent pas dans la carte, veuillez entrer un nouveau point de départ: ")
                         strB = input("\nVeuillez entrer le point d'arrivée: ")
+=======
+                        #g.plusCourtChemin(pointA, pointB, 2)
+                    else:
+                        strA = input("\nPoints ne se situent pas dans la carte, veuillez entrer un nouveau point de départ\n")
+                        strB = input("\nVeuillez entrer le point d'arrivée\n")
+>>>>>>> 2ffcf4d5cf45e64512730f818ab5930af923a218
 
                 #Si l'usager rentre des points dans un format erroné (ex. un mot)
                 except ValueError:
                     print("\nDonnées erronées, veuillez entrer les points par leur nombre correspondant\n")
+<<<<<<< HEAD
                     strA = input("\nVeuillez entrer le point de départ: ")
                     strB = input("\nVeuillez entrer le point d'arrivée: ")
                     
@@ -78,11 +103,23 @@ def main():
 
             #Redemande le point 
             while(not(donneeCorrecte)):
+=======
+                    strA = input("\nVeuillez entrer le point de départ\n")
+                    strB = input("\nVeuillez entrer le point d'arrivée\n")
+                    
+        elif(choix == "C"):
+            strPoint = input("\nVeuillez entrer le point de départ\n")
+            donneesCorrectes = False
+
+            #Redemande le point
+            while(not(donneesCorrectes)):
+>>>>>>> 2ffcf4d5cf45e64512730f818ab5930af923a218
                 try:
                     point = int(strPoint)
 
                     #Vérifie si le point se situe sur la carte
                     if(point >= POINT_MIN and point <= POINT_MAX):
+<<<<<<< HEAD
                         donneeCorrecte = True
                         #g.extraireSousGraphe(point)
                     else:
@@ -91,6 +128,37 @@ def main():
                 #Si l'usager rentre des points dans un format erroné (ex. un mot)
                 except ValueError:
                     strPoint = input("\nDonnée erronée, veuillez entrer le point par son nombre correspondant: ")
+=======
+
+                        vehicule = input("\nVeuillez entrer le type d'ambulance\n")
+                        vehicule = vehicule.upper()
+                        if vehicule == "NI-NH" or vehicule == " LI-ION":
+                            donneesCorrectes = True
+                            if vehicule == "NI-NH":
+                                objVehicule = Vehicule(0)
+                            else:
+                                objVehicule = Vehicule(1)
+                            etatPatient = input("\nVeuillez entrer l'état du patient, soit : \n1 - faible risque,\n2 - risque moyen,\n3 - haut risque.\n")
+                            etat = int(etatPatient)
+                            etiquettesSommets = [point, 0, []]
+                            cheminMax = [point, 0, []]
+                            etiquettesSommets[2].append(point)
+                            g.extraireSousGraphe(point, etiquettesSommets, objVehicule, etat - 1, cheminMax)
+                            print("\nChemin le plus long sur une charge :\n")
+                            output = ""
+                            for point in etiquettesSommets[2]:
+                                output += str(point)
+                                output += " -> "
+                            print(output[:-4] + "\n" + "Longueur : " + str(len(etiquettesSommets[2]) - 1))
+                        else:
+                            print("\nType d'ambulance invalide, veuillez rentrer les données\n")
+                    else:
+                        strPoint = input("\nPoint ne se situe pas dans la carte, veuillez entrer un nouveau point de départ\n")
+
+                #Si l'usager rentre des points dans un format erroné (ex. un mot)
+                except ValueError:
+                    strPoint = input("\nDonnée erronée, veuillez entrer le point par son nombre correspondant\n")
+>>>>>>> 2ffcf4d5cf45e64512730f818ab5930af923a218
             print("Extraire un sous-graphe")
 
         elif(choix == "D"):
