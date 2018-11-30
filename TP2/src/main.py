@@ -1,21 +1,16 @@
+from automate import Automate
 
-def readFile(filename):
-    f = open(filename, "r")
-    lexicon = []
-
-    for ligne in f:
-        lexicon.append(list(ligne))
-
-    f.close()
-
-    return lexicon
 
 def main():
-    lexicon = readFile("lexique 1.txt")
-
-    #for i in lexicon:
-    print(lexicon[0])
-
+    try:
+        automate = Automate("lexique6.txt")
+        automate.findWords("cas")
+    except IOError:
+        print("\nERREUR : Nom de fichier erroné")
+    except ValueError:
+        print("\nERREUR : Mot cherché n'existe pas dans ce lexique")
+    except TypeError:
+        print("\nERREUR : Mot de type inconnu")
 
 if __name__ == "__main__":
     main()
