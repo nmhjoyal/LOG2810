@@ -13,8 +13,8 @@ def readFile(filename):
 def main():
     lexicon = readFile("lexique 1.txt")
 
-    for i in lexicon:
-        print(i)
+    #for i in lexicon:
+    print(lexicon[0])
 
 
 if __name__ == "__main__":
