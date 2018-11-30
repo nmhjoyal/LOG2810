@@ -31,12 +31,14 @@ class Automate:
             print("attention le mot que vous tapez n'existe pas dans le lexique")
         else:
             self.currentState = child
+
     def findWords(self, lettres):
         self.currentState = self.origin
         for char in lettres:
             if type(char) is not str:
                 raise TypeError
             self.currentState = self.currentState.getState(char)
+        print(self.currentState.words)
 
     def enter(self, char):
         if char == " " or char == ".":  # si c'est un espace ou une ponctuation met fin au met et met les labels à jour
@@ -48,5 +50,3 @@ class Automate:
 
         else:  # passe au prochain état si c'est une lettre
             self.currentState.add(char)
-
-        print(self.currentState.words)
