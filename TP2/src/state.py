@@ -20,7 +20,8 @@ class State:
     def addWords(self, words):
         self.words = copy.deepcopy(words)
 
-    def getState(self, index):
+    def getState(self, char):
+        index = ord(char) - 97
         return self.childrenStates[index]
 
     def setChild(self, index, state):
@@ -30,8 +31,7 @@ class State:
         self.parent = parentState
 
     def fill(self, char):
-        index = int(char) - 97
-        if self.childrenStates[index] is not None:
-            self.childrenStates[index].fill(char)
-        else:
+        index = ord(char) - 97
+        if self.childrenStates[index] is None:
             self.setChild(index, State(self))
+
