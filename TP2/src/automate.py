@@ -1,16 +1,21 @@
 from state import State
+import queue
 
 class Automate:
     def __init__(self, lexicon):
-        self.states = []
-        self.currentId = 0;
+        self.origin = State()
+        self.currentState = self.origin
         self.createAutomate(lexicon)
+        self.fiveLast = queue.Queue(5)
 
     def createAutomate(self, lexicon):
-        self.states[0] = State(0, "")
-        self.currentId += 1
 
-        currentWord = 0
+        for i in lexicon: #pour chaque ligne
+            self.currentState = self.origin #on revient au point de départ à chaque nouveau mot
+            for j in i:#pour chaque caractère
+                int index = ord(j)
+                if self.currentState.getState(index) is None : #si on a pas encore d'enfants pour cette lettre
+                    
+                    self.currentState.setState(index,State)
 
-        for i in lexicon[currentWord]:
-            self.states[self.currentId] = State(self.currentId, i)
+                self.states[self.currentId] = State(self.currentId, i)
