@@ -10,12 +10,16 @@ class Automate:
 
     def createAutomate(self, lexicon):
 
-        for i in lexicon: #pour chaque ligne
-            self.currentState = self.origin #on revient au point de départ à chaque nouveau mot
-            for j in i:#pour chaque caractère
-                int index = ord(j)
-                if self.currentState.getState(index) is None : #si on a pas encore d'enfants pour cette lettre
-                    
-                    self.currentState.setState(index,State)
+        for i in lexicon:  # pour chaque ligne
+            self.currentState = self.origin  # on revient au point de départ à chaque nouveau mot
+            for j in i:  # pour chaque caractère
+                if j is not "\n":
+                    self.currentState.fill(j)  # regarde si l'enfant est deja present et le rajoute s'il ne l'est pas
+                    self.currentState = self.currentState.getState(j)
+                else: #si c'est la fin du mot
+                    self.currentState.makeTerminal()
+                    word = i[:-1]
+                    self.currentState.addWord(word)  # ajoute le mot au current state et à tous ses parents
 
-                self.states[self.currentId] = State(self.currentId, i)
+
+
