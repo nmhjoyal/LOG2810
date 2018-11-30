@@ -1199,7 +1199,7 @@ apparente
 appariteur
 apparition
 appartement
-appartement)
+appartement
 appartements
 appartenaient
 appartenait
@@ -1552,7 +1552,7 @@ assertion
 asservi
 asservir
 assez
-assez!
+assez
 assiduite
 assieger
 assiette
@@ -1936,7 +1936,7 @@ avidite
 aviez
 avilir
 avion
-avion)
+avion
 avions
 aviron
 avis
@@ -4029,7 +4029,7 @@ compare
 comparee
 comparer
 compares
-comparez!
+comparez
 compartiment
 compartiments
 compas
@@ -4996,7 +4996,7 @@ crepi
 crepir
 crepiter
 crepu
-crepus)
+crepus
 crepuscule
 cresson
 crete
@@ -5218,7 +5218,7 @@ davantage
 de
 deale
 dealers
-deballe!
+deballe
 debander
 debarbouiller
 debarcadere
@@ -8381,7 +8381,7 @@ fetes
 fets
 fetus
 feu
-feu!
+feu
 feuillage
 feuille
 feuilles
@@ -18403,7 +18403,7 @@ suffisantes
 suffisants
 suffisent
 suffit
-suffit!
+suffit
 suffixe
 suffocation
 suffoquer
