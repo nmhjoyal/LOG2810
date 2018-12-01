@@ -32,23 +32,32 @@ class Automate:
         else:
             self.currentState = child
 
+
     def findWords(self, lettres):
         self.currentState = self.origin
         for char in lettres:
             if type(char) is not str:
                 raise TypeError
             self.currentState = self.currentState.getState(char)
-        # print (self.currentState.words)
-        return self.currentState.words
+        print (self.currentState.words)
+        #return self.currentState.words
 
     def enter(self, char):
         if char == " " or char == ".":  # si c'est un espace ou une ponctuation met fin au met et met les labels à jour
-            if self.currentState.EndPoint():
+            if self.currentState.isTerminal():
                 self.currentState.addTimesUsed()
-                self.addQueue(self.currentState)
+                if self.fiveLast.full():  # si la queue est pleine enleve le premier
+                    temp = self.fiveLast.get(False)  # récupere le mot et indique qu'il n'est plus dans les 5 derniers
+                    temp.removeLastFive()
+                self.fiveLast.put_nowait(self.currentState)
+                self.currentState.makeLastFive()
+                self.currentState = self.origin
             else:  # si le mot terminé n'est pas un mot du lexique
-                # print("attention tu es cave ce mot n'existe pas")
-                return("Attention tu es cave ce mot n'existe pas")
+                print("attention tu es cave ce mot n'existe pas")
+                #return("Attention tu es cave ce mot n'existe pas")
 
         else:  # passe au prochain état si c'est une lettre
-            self.currentState.add(char)
+            self.add(char)
+
+    def getFiveLast(self):
+        return self.fiveLast
