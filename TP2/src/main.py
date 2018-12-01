@@ -1,6 +1,4 @@
 from automate import Automate
-from PyQt5.QtWidgets import *
-import interface as interface
 import sys
 
 
