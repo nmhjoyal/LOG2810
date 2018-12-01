@@ -38,7 +38,7 @@ class Automate:
             if type(char) is not str:
                 raise TypeError
             self.currentState = self.currentState.getState(char)
-        print(self.currentState.words)
+        return self.currentState.words
 
     def enter(self, char):
         if char == " " or char == ".":  # si c'est un espace ou une ponctuation met fin au met et met les labels à jour

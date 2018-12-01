@@ -1,7 +1,11 @@
 from automate import Automate
+from PyQt5.QtWidgets import *
+import interface as interface
+import sys
 
 
 def main():
+
     try:
         automate = Automate("lexique6.txt")
         automate.findWords("cas")
