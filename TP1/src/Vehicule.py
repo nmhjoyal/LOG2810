@@ -15,7 +15,7 @@ class Vehicule:
         #Definit la consommation horaire dependamment du type de voiture
         #0 = NI-MH
         if(self.type==0):
-            self.consommationHoraire=[6,12,48]
+            self.consommationHoraire=[20,12,48]
         #1 = LI-Ion
         else:
             self.consommationHoraire=[5, 10, 30]
@@ -83,8 +83,7 @@ class Vehicule:
     # recharge
     def parcourirCheminSansRecharge(self, temps, categoriePatient):
         consommationParMinute = self.consommationHoraire[categoriePatient]/60
-
-        self.batterie -= temps*consommationParMinute
+        self.batterie -= round(Decimal(temps*consommationParMinute),2)
 
         # On réinitialise la batterie pour faciliter l'utilisation de la fonction
         if self.batterie > 20:
