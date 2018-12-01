@@ -49,3 +49,12 @@ class State:
     def makeTerminal(self):
         self.isEndPoint = 1
 
+    def isTerminal(self):
+        return self.isEndPoint
+
+    def makeLastFive(self):
+        self.isLastFive = 1
+
+    def removeLastFive(self):
+        self.isLastFive = 0
+

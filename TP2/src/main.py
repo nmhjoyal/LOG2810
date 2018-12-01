@@ -2,11 +2,26 @@ from automate import Automate
 import sys
 
 
+
 def main():
 
     try:
         automate = Automate("lexique6.txt")
-        automate.findWords("cas")
+        #automate.findWords("cas")
+        automate.enter('c')
+        automate.enter('a')
+        automate.enter('s')
+        automate.enter('e')
+        automate.enter('r')
+        automate.enter(' ')
+
+        automate.enter('c')
+        automate.enter('a')
+        automate.enter('s')
+        automate.enter(' ')
+
+
+        print(automate.getFiveLast())
     except IOError:
         print("\nERREUR : Nom de fichier erroné")
     except ValueError:
