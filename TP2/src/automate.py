@@ -27,12 +27,14 @@ class Automate:
 
 
     def findWords(self, lettres):
-        self.currentState = self.origin
+
         for char in lettres:
             if type(char) is not str:
                 raise TypeError
-            self.currentState = self.currentState.getState(char)
-        print (self.currentState.words)
+            self.add(char)
+        print(self.currentState.words)
+        self.add(" ")
+
         #return self.currentState.words
 
     def add(self, char):
@@ -64,3 +66,23 @@ class Automate:
             timeused = self.currentState.getTimeused()
             fivelast = self.currentState.ifLastFive()
             return (timeused, fivelast)  # retourne le nbr de fois utilisé en premier et s'il a été dans les 5 dernier mot dit dans le 2ieme
+        else:
+            return (0,0)
+
+    def getAllLabel(self, lexicon):
+        current = self.currentState
+
+        self.currentState = self.origin
+        if not open(lexicon, "r"):
+            raise IOError
+
+        f = open(lexicon, "r")
+        for i in f:  # pour chaque ligne
+            self.currentState = self.origin  # on revient au point de départ à chaque nouveau mot
+            for j in i:  # pour chaque caractère
+                if j is "\n":
+                    print(i, self.currentState.getTimeused(), self.currentState.ifLastFive())
+                    break
+                else:
+                    self.currentState = self.currentState.getState(j)
+        self.currentState = current

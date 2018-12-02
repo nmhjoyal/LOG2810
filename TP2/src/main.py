@@ -7,65 +7,16 @@ def main():
 
     try:
         automate = Automate("lexique6.txt")
-        #automate.findWords("cas")
-        automate.add('c')
-        automate.add('a')
-        automate.add('s')
-        automate.add('e')
-        automate.add('r')
-        automate.add(' ')
+        automate.findWords("cas")
+        automate.findWords("cas")
+        automate.findWords("cas")
+        automate.findWords("cas")
 
-        automate.add('c')
-        automate.add('a')
-        automate.add('s')
-        automate.add(' ')
-
-        automate.add('c')
-        automate.add('a')
-        automate.add('s')
-        automate.add(' ')
-
-        automate.add('c')
-        automate.add('a')
-        automate.add('s')
-        automate.add(' ')
-
-        automate.add('c')
-        automate.add('a')
-        automate.add('s')
-        automate.add('e')
-        automate.add('r')
-        automate.add(' ')
-
-        automate.add('c')
-        automate.add('a')
-        automate.add('s')
-        automate.add('e')
-        automate.add('r')
-        automate.add(' ')
-
-        automate.add('c')
-        automate.add('a')
-        automate.add('s')
-        automate.add('e')
-        automate.add('r')
-        automate.add(' ')
-
-        automate.add('c')
-        automate.add('a')
-        automate.add('s')
-        automate.add('e')
-        automate.add('r')
-        automate.add(' ')
-
-        automate.add('c')
-        automate.add('a')
-        automate.add('s')
-        #automate.add(' ')
 
         [timeused, isfivelast] = automate.getLabel()
         print(timeused)
         print(isfivelast)
+        automate.getAllLabel("lexique6.txt")
 
     except IOError:
         print("\nERREUR : Nom de fichier erroné")
