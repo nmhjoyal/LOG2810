@@ -25,13 +25,6 @@ class Automate:
                     self.currentState.addWord(word)  # ajoute le mot au current state et à tous ses parents
         self.currentState = self.origin
 
-    def add(self, lettre): # on ajoute une lettre
-        child = self.currentState.getState(lettre)
-        if child is 0:
-            print("Attention le mot que vous tapez n'existe pas dans le lexique")
-        else:
-            self.currentState = child
-
 
     def findWords(self, lettres):
         self.currentState = self.origin
@@ -42,8 +35,8 @@ class Automate:
         print (self.currentState.words)
         #return self.currentState.words
 
-    def enter(self, char):
-        if char == " " or char == ".":  # si c'est un espace ou une ponctuation met fin au met et met les labels à jour
+    def add(self, char):
+        if char == " " or char == ".":  # si c'est un espace ou une ponctuation met fin au mot et met les labels à jour
             if self.currentState.isTerminal():
                 self.currentState.addTimesUsed()
                 if self.fiveLast.full():  # si la queue est pleine enleve le premier
@@ -57,7 +50,17 @@ class Automate:
                 #return("Attention tu es cave ce mot n'existe pas")
 
         else:  # passe au prochain état si c'est une lettre
-            self.add(char)
+            child = self.currentState.getState(char)
+            if child is 0:
+                print("Attention le mot que vous tapez n'existe pas dans le lexique")
+            else:
+                self.currentState = child
 
     def getFiveLast(self):
         return self.fiveLast
+
+    def getLabel(self):  # retourne les label du current state, donc du mot en train de s'écrire
+        if self.currentState.isTerminal():
+            timeused = self.currentState.getTimeused()
+            fivelast = self.currentState.ifLastFive()
+            return (timeused, fivelast)  # retourne le nbr de fois utilisé en premier et s'il a été dans les 5 dernier mot dit dans le 2ieme

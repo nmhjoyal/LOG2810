@@ -53,8 +53,19 @@ class State:
         return self.isEndPoint
 
     def makeLastFive(self):
-        self.isLastFive = 1
+        self.isLastFive += 1
 
     def removeLastFive(self):
-        self.isLastFive = 0
+        self.isLastFive -= 1
+
+    def ifLastFive(self):
+        if self.isLastFive >=1:
+            return True
+        elif self.isLastFive == 0:
+            return False
+        else:
+            print("erreur dans le isLastFive")
+
+    def getTimeused(self):
+        return self.timesUsed
 
