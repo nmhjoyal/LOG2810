@@ -58,6 +58,11 @@ class Automate:
             else:
                 self.currentState = child
 
+
+    def backspace(self):
+        if self.currentState.getParent() is not None:
+            self.currentState = self.currentState.getParent()
+
     def getFiveLast(self):
         return self.fiveLast
 

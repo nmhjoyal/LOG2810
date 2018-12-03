@@ -36,6 +36,9 @@ class State:
     def setChild(self, index, state):
         self.childrenStates[index] = state
 
+    def getParent(self):
+        return self.parent
+
     def setParent(self, parentState):
         self.parent = parentState
 
