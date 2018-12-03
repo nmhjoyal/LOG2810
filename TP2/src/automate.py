@@ -27,15 +27,16 @@ class Automate:
 
 
     def findWords(self, lettres):
+        self.currentState = self.origin
 
         for char in lettres:
             if type(char) is not str:
                 raise TypeError
             self.add(char)
-        print(self.currentState.words)
-        self.add(" ")
+        return self.currentState.words
 
-        #return self.currentState.words
+
+        
 
     def add(self, char):
         if char == " " or char == ".":  # si c'est un espace ou une ponctuation met fin au mot et met les labels à jour
