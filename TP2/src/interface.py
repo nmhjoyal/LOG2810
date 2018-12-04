@@ -4,8 +4,9 @@ from PyQt5.QtWidgets import *
 from PyQt5 import QtCore, QtGui, Qt, QtWidgets
 from PyQt5 import sip
 from automate import Automate
+import re
 
-
+charFin = [" ", ",", ":", ";"]
 
 class Interface(QtWidgets.QMainWindow):
 
@@ -19,7 +20,12 @@ class Interface(QtWidgets.QMainWindow):
                 self.i=0
                 self.checked = 0
 
+                self.automate = Automate("lexique6.txt")
+
                 self.initUI()
+
+                self.shouldShowLabels = True
+          
 
         def initUI(self):
                 self.setWindowTitle(self.title)
@@ -46,7 +52,7 @@ class Interface(QtWidgets.QMainWindow):
                 self.l2.resize(200,30)
 
                 #LINE BOX //Input mot à rechercher
-                self.textbox = QtWidgets.QLineEdit(self)
+                self.textbox = MyLineEdit(self)
                 self.textbox.move(20, 255)
                 self.textbox.resize(130,20)
                 self.textbox.setStyleSheet("border: 1px solid red;")
@@ -57,10 +63,11 @@ class Interface(QtWidgets.QMainWindow):
                 self.l3.move(290,5)
                 self.l3.resize(200,30)
 
-                #BARRE D'AFFICHAGE DU PATH
+                #BARRE D'AFFICHAGE DU FICHIER
                 self.filename = QtWidgets.QLineEdit(self)
                 self.filename.move(290, 30)
                 self.filename.resize(150,20)
+                self.filename.setText("lexique6.txt")
                 self.filename.setStyleSheet("background-color:lightGray; color: black;")
                 self.filename.setDisabled(True)
                 
@@ -117,11 +124,13 @@ class Interface(QtWidgets.QMainWindow):
                 self.checkShowLabels.resize(160,20)
 
                 ##CONNEXIONS
-                self.textbox.textChanged.connect(self.textarea.on_change)
+                # self.textbox.textChanged.connect(self.textarea.on_change)
                 self.browseButton.clicked.connect(self.handleBrowseButton)
-                self.checkShowLabels.stateChanged.connect(self.textarea.on_change)
+                self.checkShowLabels.stateChanged.connect(self.handleLabelCheckBox)
+                self.textbox.installEventFilter(self)
+                self.textbox.keyPressed.connect(self.textarea.on_change)
 
-
+        #Gestionnaire du bouton browse
         def handleBrowseButton(self):
                 self.filePath = QtWidgets.QFileDialog.getOpenFileName(self, "Selectionnez le lexique",)
                 self.splitPath = self.filePath[0].split('/')
@@ -133,45 +142,82 @@ class Interface(QtWidgets.QMainWindow):
                         self.error_dialog.showMessage("TypeERROR Le fichier choisi n'a pas pu être ouvert, choisissez un autre (.TXT).")
                 except  IOError:
                         self.error_dialog.showMessage("IOError Le fichier choisi n'a pas pu être ouvert, choisissez un autre (.TXT).")
+        
+        #Choisit s'il faut que les labels soient ajoutés ou retirés
+        def handleLabelCheckBox(self):
+                labels = self.automate.getLabel()
+                if self.checkShowLabels.isChecked() and labels[0] != 0 and self.shouldShowLabels:
+                        self.showLabels()
+                else:
+                        self.hideLabels()
 
+        #Affiche les labels selon l'etat courant de la machine
+        def showLabels(self):
+                labels = self.automate.getLabel()
+                self.labelTimesUsed.setText(str(labels[0]))
+                if self.automate.getLabel()[1]:
+                        self.labelLastFive.setText("Oui")
+                else:
+                        self.labelLastFive.setText("Non")
+
+        #Cache les labels 
         def hideLabels(self):
                 self.labelTimesUsed.setText("")
                 self.labelLastFive.setText("")
 
-                                
-                
+        #EVENTFILTER pour obtenir le bouton appuyé 
+        def eventFilter(self, source, event):
+                if (event.type() == QtCore.QEvent.KeyPress and
+                        source is self.textbox):
+                        print('key press:', (event.key(), event.text()))
+                return super(QtWidgets.QMainWindow, self).eventFilter(source, event)
 
+
+
+class MyLineEdit(QtWidgets.QLineEdit):
+        keyPressed = QtCore.pyqtSignal(int)
+        def keyPressEvent(self, event):
+                super(MyLineEdit, self).keyPressEvent(event)
+                self.keyPressed.emit(event.key())
+     
+
+#Classe TextEdit réimplémentée
 class MyTextEdit(QtWidgets.QTextEdit):
         def __init__(self, parent):
                 if not isinstance(parent, QtWidgets.QMainWindow):
                         raise TypeError('parent must be a MainWindow')
                 super(MyTextEdit, self).__init__(parent)
 
-        @QtCore.pyqtSlot()
-        def on_change(self):
-                message = self.parent().textbox.text()
+        @QtCore.pyqtSlot(int)
+        def on_change(self, key):
+                self.parent().shouldShowLabels = True
+                texte = self.parent().textbox.text()      
+                mots = re.findall(r"[\w']+",texte) #OBTIENT UN TABLEAU DE TOUS LES MOTS
+                motCourant =  mots[len(mots)-1]    #OBTIENT LE DERNIER MOT ENTRÉ
+                dernierChar = texte[len(texte)-1]
                 
+                #On vide textarea avant de réajouter tous les mots
                 self.clear()
-                self.insertPlainText(message + "\n") ## REMOVE
-                if len(message) == 0:
+                #S'il n'y a aucune possibilité de mot, alors on affiche un message incitant à écrire
+                if len(mots) == 0:
                         self.insertPlainText("Entrez une lettre dans la barre du bas pour obtenir des suggestions")
-                        self.parent().labelTimesUsed.setText("")
-                        self.parent().labelLastFive.setText("")
+                        self.parent().hideLabels()
+                #S'il y a possibilité de mot, on essaie
                 else:
                         try:
                                 automate = self.parent().automate
-                                # lexique = automate.findWords(message)
-                                lexique = automate.findWords("abces abces")
+                                if key == 16777219 or key == 16777223: #Si backspace, on n'ajoute pas au label
+                                        lexique = automate.findWordsWithoutUpdate(motCourant)
+                                else:
+                                        lexique = automate.findWords(motCourant)
                                 for i in lexique:
                                         self.insertPlainText(i + "\n")
-                                if self.parent().checkShowLabels.isChecked():
-                                        self.parent().labelTimesUsed.setText(str(automate.getLabel()[0]))
-                                        if automate.getLabel()[1]:
-                                                self.parent().labelLastFive.setText("Oui")
-                                        else:
-                                                self.parent().labelLastFive.setText("Non")
-                                else:
+                                if (dernierChar in charFin):
+                                        self.parent().shouldShowLabels = False
                                         self.parent().hideLabels()
+                                        self.clear()
+                                else:                         
+                                        self.parent().handleLabelCheckBox()
 
                         except IOError:
                                 self.insertPlainText("ERREUR : Nom de fichier erroné")
@@ -188,9 +234,9 @@ class MyTextEdit(QtWidgets.QTextEdit):
                         except AttributeError:
                                 self.insertPlainText("ERREUR : Le fichier choisi n'est pas un lexique, en choisir un autre.")
                                 self.parent().hideLabels()
+       
 
 if __name__ == '__main__':
-
 
         app = QtWidgets.QApplication(sys.argv)
         ex = Interface()

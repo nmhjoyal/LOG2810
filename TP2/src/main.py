@@ -8,17 +8,13 @@ def main():
     try:
         automate = Automate("lexique6.txt")
 
-        automate.findWords("a")
-        automate.findWords("ab")
-        automate.findWords("abc")
-        automate.findWords("abce")
         automate.findWords("abces")
-        automate.findWords("abces ")
-        automate.findWords("abces a")
-        automate.findWords("abces ab")
-        automate.findWords("abces abc")
-        automate.findWords("abces abce")
-        automate.findWords("abces abces")
+        automate.findWords("abces")
+        automate.findWords("abces")
+        automate.findWords("abces")
+        automate.findWords("abces")
+        automate.findWords("abces")
+        automate.findWords("abces")
 
         print(automate.getLabel()[0])
         print(automate.getLabel()[1])

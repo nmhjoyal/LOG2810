@@ -7,6 +7,7 @@ class Automate:
         self.currentState = self.origin
         self.createAutomate(lexicon)
         self.fiveLast = queue.Queue(5)
+        self.lastWord = ""
 
     def createAutomate(self, lexicon):
         if not open(lexicon, "r"):
@@ -28,37 +29,43 @@ class Automate:
 
     def findWords(self, lettres):
         self.currentState = self.origin
+        isLastChar = False
 
+        i=1 #Nombre de caracteres traités
         for char in lettres:
             if type(char) is not str:
                 raise TypeError
-            self.add(char)
+            if i == len(lettres):
+                isLastChar = True
+            self.add(char,isLastChar)
+            i += 1 
+        self.setLastWord(lettres)
         return self.currentState.words
 
-
-        
-
-    def add(self, char):
-        if char == " " or char == ".":  # si c'est un espace ou une ponctuation met fin au mot et met les labels à jour
-            if self.currentState.isTerminal():
+    def add(self, char, isLastChar):
+        self.currentState = self.currentState.getState(char)
+        if self.currentState.isTerminal() and not self.isLastWord(self.currentState.words[0]) and isLastChar:        
                 self.currentState.addTimesUsed()
                 if self.fiveLast.full():  # si la queue est pleine enleve le premier
                     temp = self.fiveLast.get(False)  # récupere le mot et indique qu'il n'est plus dans les 5 derniers
                     temp.removeLastFive()
                 self.fiveLast.put_nowait(self.currentState)
                 self.currentState.makeLastFive()
-                self.currentState = self.origin
-            else:  # si le mot terminé n'est pas un mot du lexique
-                print("attention tu es cave ce mot n'existe pas")
-                #return("Attention tu es cave ce mot n'existe pas")
+        if self.currentState == 0:
 
-        else:  # passe au prochain état si c'est une lettre
-            child = self.currentState.getState(char)
-            if child is 0:
-                print("Attention le mot que vous tapez n'existe pas dans le lexique")
-            else:
-                self.currentState = child
+            print("Attention le mot que vous tapez n'existe pas dans le lexique")
 
+    def findWordsWithoutUpdate(self, lettres):
+        self.currentState = self.origin
+        for char in lettres:
+            if type(char) is not str:
+                raise TypeError
+            self.addWithoutUpdate(char)
+        self.setLastWord(lettres)
+        return self.currentState.words
+
+    def addWithoutUpdate(self, char):
+        self.currentState = self.currentState.getState(char)
 
     def backspace(self):
         if self.currentState.getParent() is not None:
@@ -92,3 +99,12 @@ class Automate:
                 else:
                     self.currentState = self.currentState.getState(j)
         self.currentState = current
+
+    def setLastWord(self, word):
+        self.lastWord = word
+
+    def isLastWord(self, word):
+        if (word == self.lastWord):
+            return True
+        else: 
+            return False

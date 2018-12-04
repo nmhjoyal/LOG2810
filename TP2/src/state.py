@@ -72,3 +72,6 @@ class State:
     def getTimeused(self):
         return self.timesUsed
 
+    def getWords(self):
+        return self.words
+
