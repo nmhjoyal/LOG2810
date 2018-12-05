@@ -8,6 +8,11 @@ import re
 
 charFin = [" ", ",", ":", ";"]
 
+#############################################################################
+## COMME IL EST IMPOSSIBLE DE REMETTRE UN FICHIER .EXE DANS NOTRE ARCHIVE, ##
+# POUR QUE L'INTERFACE FONCTIONNE, INSTALLER PYQT5                          #
+#############################################################################
+
 class Interface(QtWidgets.QMainWindow):
 
         def __init__(self):
@@ -194,7 +199,6 @@ class MyTextEdit(QtWidgets.QTextEdit):
                 texte = self.parent().textbox.text()      
                 mots = re.findall(r"[\w']+",texte) #OBTIENT UN TABLEAU DE TOUS LES MOTS
   
-                
                 #On vide textarea avant de réajouter tous les mots
                 self.clear()
                 #S'il n'y a aucune possibilité de mot, alors on affiche un message incitant à écrire
