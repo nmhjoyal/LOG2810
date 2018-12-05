@@ -7,7 +7,6 @@ class Automate:
         self.currentState = self.origin
         self.createAutomate(lexicon)
         self.fiveLast = queue.Queue(5)
-        self.lastWord = ""
 
     def createAutomate(self, lexicon):
         if not open(lexicon, "r"):
@@ -40,36 +39,25 @@ class Automate:
                 isLastChar = True
             self.add(char,isLastChar)
             i += 1 
-        self.setLastWord(lettres)
 
-        return self.currentState.words
+        return self.currentState.getWords()
 
     def add(self, char, isLastChar):
         self.currentState = self.currentState.getState(char)
         if self.currentState.isTerminal() and isLastChar:        
                 self.currentState.addTimesUsed()
-                if self.fiveLast.full():  # si la queue est pleine enleve le premier
+                if self.fiveLast.full():             # si la queue est pleine enleve le premier
                     temp = self.fiveLast.get(False)  # récupere le mot et indique qu'il n'est plus dans les 5 derniers
                     temp.removeLastFive()
                 self.fiveLast.put_nowait(self.currentState)
                 self.currentState.makeLastFive()
-        if self.currentState == 0:
-            print("Attention le mot que vous tapez n'existe pas dans le lexique")
 
     def findWordsWithoutUpdate(self, lettres):
         self.currentState = self.origin
         for char in lettres:
-            if type(char) is not str:
-                raise TypeError
-            self.addWithoutUpdate(char)
-        self.setLastWord(lettres)
-        return self.currentState.words
-    def addWithoutUpdate(self, char):
-        self.currentState = self.currentState.getState(char)
-
-    def backspace(self):
-        if self.currentState.getParent() is not None:
-            self.currentState = self.currentState.getParent()
+            self.currentState = self.currentState.getState(char)
+        
+        return self.currentState.getWords()
 
     def getFiveLast(self):
         return self.fiveLast
@@ -99,15 +87,6 @@ class Automate:
                 else:
                     self.currentState = self.currentState.getState(j)
         self.currentState = current
-
-    def setLastWord(self, word):
-        self.lastWord = word
-
-    def isLastWord(self, word):
-        if (word == self.lastWord):
-            return True
-        else: 
-            return False
 
     def isAlphanumerical(self, char):
         index = ord(char) - 97

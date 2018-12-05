@@ -22,9 +22,6 @@ class State:
         if self.parent is not None:
             self.parent.addWord(word)
 
-    def addWords(self, words):
-        self.words = copy.deepcopy(words)
-
     def getState(self, char):
         index = ord(char) - 97
         if 155 > index > 26 or index == -58 or index == 242:
@@ -35,12 +32,6 @@ class State:
 
     def setChild(self, index, state):
         self.childrenStates[index] = state
-
-    def getParent(self):
-        return self.parent
-
-    def setParent(self, parentState):
-        self.parent = parentState
 
     def fill(self, char):
         index = ord(char) - 97

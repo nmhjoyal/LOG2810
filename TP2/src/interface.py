@@ -6,7 +6,7 @@ from PyQt5 import sip
 from automate import Automate
 import re
 
-charFin = [" ", ",", ":", ";"]
+charFin = [" ", ",", ":", ";", "."]
 
 #############################################################################
 ## COMME IL EST IMPOSSIBLE DE REMETTRE UN FICHIER .EXE DANS NOTRE ARCHIVE, ##
@@ -24,13 +24,9 @@ class Interface(QtWidgets.QMainWindow):
                 self.height = 285
                 self.i=0
                 self.checked = 0
-
                 self.automate = Automate("lexique6.txt")
-
                 self.initUI()
-
-                self.shouldShowLabels = True
-          
+                self.shouldShowLabels = False
 
         def initUI(self):
                 self.setWindowTitle(self.title)
@@ -128,8 +124,17 @@ class Interface(QtWidgets.QMainWindow):
                 self.checkShowLabels.move(290, 255)
                 self.checkShowLabels.resize(160,20)
 
+                #LABEL 1 // Mot proposé
+                self.l5 = QtWidgets.QLabel(self)
+                self.l5.setText("Instructions:\n 1. Choisissez un lexique \n situé dans le même \n dossier qu'interface.py \n 2. Entrez votre mot puis \n appuyez ENTER pour \n le choisir")
+                self.l5.move(290,70)
+                self.l5.resize(150,130)
+
+                f = self.l5.font()
+                f.setPointSize(9)
+                self.l5.setFont(f)
+                
                 ##CONNEXIONS
-                # self.textbox.textChanged.connect(self.textarea.on_change)
                 self.browseButton.clicked.connect(self.handleBrowseButton)
                 self.checkShowLabels.stateChanged.connect(self.handleLabelCheckBox)
                 self.textbox.installEventFilter(self)
@@ -169,15 +174,6 @@ class Interface(QtWidgets.QMainWindow):
                 self.labelTimesUsed.setText("")
                 self.labelLastFive.setText("")
 
-        #EVENTFILTER pour obtenir le bouton appuyé 
-        def eventFilter(self, source, event):
-                if (event.type() == QtCore.QEvent.KeyPress and
-                        source is self.textbox):
-                        print('key press:', (event.key(), event.text()))
-                return super(QtWidgets.QMainWindow, self).eventFilter(source, event)
-
-
-
 #Classe QLineEdit réimplémentée pour réimplémenter keyPressEvent
 class MyLineEdit(QtWidgets.QLineEdit):
         keyPressed = QtCore.pyqtSignal(int)
@@ -195,7 +191,6 @@ class MyTextEdit(QtWidgets.QTextEdit):
 
         @QtCore.pyqtSlot(int)
         def on_change(self, key):
-                self.parent().shouldShowLabels = True
                 texte = self.parent().textbox.text()      
                 mots = re.findall(r"[\w']+",texte) #OBTIENT UN TABLEAU DE TOUS LES MOTS
   
@@ -204,21 +199,22 @@ class MyTextEdit(QtWidgets.QTextEdit):
                 #S'il n'y a aucune possibilité de mot, alors on affiche un message incitant à écrire
                 if len(mots) == 0:
                         self.insertPlainText("Entrez une lettre dans la barre du bas pour obtenir des suggestions")
+                        self.shouldShowLabels = False
                         self.parent().hideLabels()
-                #S'il y a possibilité de mot, donc qu'il n'est pas de longueur 0, on essaie
+                #il y a possibilité de mot, donc qu'il n'est pas de longueur 0, on essaie
                 else:
                         try:
-                                motCourant =  mots[len(mots)-1]    #OBTIENT LE DERNIER MOT ENTRÉ
+                                motCourant =  mots[len(mots)-1] #OBTIENT LE DERNIER MOT ENTRÉ
                                 dernierChar = texte[len(texte)-1] 
                                 automate = self.parent().automate
-                                if key != 16777220: #Si pas enter, on n'ajoute pas au label
+                                if key != 16777220: #Si pas enter, on n'update pas le label
                                         lexique = automate.findWordsWithoutUpdate(motCourant)
                                         if (lexique[0] == motCourant): #Si le motCourant est un mot dans le lexique, 
                                                 self.parent().shouldShowLabels = True
                                                 self.parent().handleLabelCheckBox()
                                         else:
-                                                self.parent().shouldShowLabels = False
-                                else:
+                                                self.parent().shouldShowLabels = False #Pas un mot dans le lexique, donc pas d'affichage de lebals
+                                else: #Si ENTER est appuyé
                                         lexique = automate.findWords(motCourant)
                                 
                                 #On ajoute tous les mots retrouvés dans textarea
@@ -229,30 +225,22 @@ class MyTextEdit(QtWidgets.QTextEdit):
                                 if (dernierChar in charFin):
                                         #On n'affiche pas les labels car le mot n'est plus courant
                                         self.parent().shouldShowLabels = False
-                                        self.parent().hideLabels()
                                         self.clear()
-                                else:                         
-                                        self.parent().handleLabelCheckBox()
+                 
+                                self.parent().handleLabelCheckBox()
 
                         except IOError:
-                                self.insertPlainText("ERREUR : Nom de fichier erroné")
+                                self.insertPlainText("Nom de fichier erroné")
                                 self.parent().hideLabels()
-                        except ValueError:
-                                self.insertPlainText("ERREUR : Mot cherché n'existe pas dans ce lexique")
-                                self.parent().hideLabels()
-                        except TypeError:
-                                self.insertPlainText("ERREUR : Mot cherché n'existe pas dans ce lexique")
-                                self.parent().hideLabels()
-                        except IndexError:
-                                self.insertPlainText("ERREUR : Mot cherché n'existe pas dans ce lexique")
+                        except (ValueError,IndexError):
+                                self.insertPlainText("Le mot cherché n'existe pas dans ce lexique")
                                 self.parent().hideLabels()
                         except AttributeError:
                                 self.insertPlainText("ERREUR : Le fichier choisi n'est pas un lexique, en choisir un autre.")
                                 self.parent().hideLabels()
-       
+
 
 if __name__ == '__main__':
-
         app = QtWidgets.QApplication(sys.argv)
         ex = Interface()
         ex.show()
