@@ -14,7 +14,7 @@ def main():
         automate.findWords("abces")
         automate.findWords("abces")
         automate.findWords("abces")
-        automate.findWords("abces")
+        print(automate.findWords("abc"))
 
         print(automate.getLabel()[0])
         print(automate.getLabel()[1])

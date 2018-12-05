@@ -146,7 +146,7 @@ class Interface(QtWidgets.QMainWindow):
         #Choisit s'il faut que les labels soient ajoutés ou retirés
         def handleLabelCheckBox(self):
                 labels = self.automate.getLabel()
-                if self.checkShowLabels.isChecked() and labels[0] != 0 and self.shouldShowLabels:
+                if self.checkShowLabels.isChecked() and self.shouldShowLabels:
                         self.showLabels()
                 else:
                         self.hideLabels()
@@ -207,12 +207,21 @@ class MyTextEdit(QtWidgets.QTextEdit):
                                 motCourant =  mots[len(mots)-1]    #OBTIENT LE DERNIER MOT ENTRÉ
                                 dernierChar = texte[len(texte)-1]
                                 automate = self.parent().automate
-                                if key == 16777219 or key == 16777223: #Si backspace, on n'ajoute pas au label
+                                if key != 16777220: #Si backspace, on n'ajoute pas au label
                                         lexique = automate.findWordsWithoutUpdate(motCourant)
+                                        print(lexique[0])
+                                        print(motCourant)
+                                        if (lexique[0] == motCourant): #Si le motCourant est un mot dans le lexique, 
+                                                self.parent().shouldShowLabels = True
+                                                self.parent().handleLabelCheckBox()
+                                        else:
+                                                self.parent().shouldShowLabels = False
                                 else:
                                         lexique = automate.findWords(motCourant)
                                 for i in lexique:
                                         self.insertPlainText(i + "\n")
+                                
+                                #Determine si les caractères qui annoncent la fin d'un mot sont présent
                                 if (dernierChar in charFin):
                                         self.parent().shouldShowLabels = False
                                         self.parent().hideLabels()
