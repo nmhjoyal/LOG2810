@@ -150,7 +150,6 @@ class Interface(QtWidgets.QMainWindow):
         
         #Choisit s'il faut que les labels soient ajoutés ou retirés
         def handleLabelCheckBox(self):
-                labels = self.automate.getLabel()
                 if self.checkShowLabels.isChecked() and self.shouldShowLabels:
                         self.showLabels()
                 else:
@@ -179,6 +178,7 @@ class Interface(QtWidgets.QMainWindow):
 
 
 
+#Classe QLineEdit réimplémentée pour réimplémenter keyPressEvent
 class MyLineEdit(QtWidgets.QLineEdit):
         keyPressed = QtCore.pyqtSignal(int)
         def keyPressEvent(self, event):
@@ -186,7 +186,7 @@ class MyLineEdit(QtWidgets.QLineEdit):
                 self.keyPressed.emit(event.key())
      
 
-#Classe TextEdit réimplémentée
+#Classe QTextEdit réimplémentée pour supporter on_change
 class MyTextEdit(QtWidgets.QTextEdit):
         def __init__(self, parent):
                 if not isinstance(parent, QtWidgets.QMainWindow):
@@ -205,16 +205,14 @@ class MyTextEdit(QtWidgets.QTextEdit):
                 if len(mots) == 0:
                         self.insertPlainText("Entrez une lettre dans la barre du bas pour obtenir des suggestions")
                         self.parent().hideLabels()
-                #S'il y a possibilité de mot, on essaie
+                #S'il y a possibilité de mot, donc qu'il n'est pas de longueur 0, on essaie
                 else:
                         try:
                                 motCourant =  mots[len(mots)-1]    #OBTIENT LE DERNIER MOT ENTRÉ
-                                dernierChar = texte[len(texte)-1]
+                                dernierChar = texte[len(texte)-1] 
                                 automate = self.parent().automate
-                                if key != 16777220: #Si backspace, on n'ajoute pas au label
+                                if key != 16777220: #Si pas enter, on n'ajoute pas au label
                                         lexique = automate.findWordsWithoutUpdate(motCourant)
-                                        print(lexique[0])
-                                        print(motCourant)
                                         if (lexique[0] == motCourant): #Si le motCourant est un mot dans le lexique, 
                                                 self.parent().shouldShowLabels = True
                                                 self.parent().handleLabelCheckBox()
@@ -222,11 +220,14 @@ class MyTextEdit(QtWidgets.QTextEdit):
                                                 self.parent().shouldShowLabels = False
                                 else:
                                         lexique = automate.findWords(motCourant)
+                                
+                                #On ajoute tous les mots retrouvés dans textarea
                                 for i in lexique:
                                         self.insertPlainText(i + "\n")
                                 
-                                #Determine si les caractères qui annoncent la fin d'un mot sont présent
+                                #Determine si les caractères qui annoncent la fin d'un mot sont présents (" ", ",", ...)
                                 if (dernierChar in charFin):
+                                        #On n'affiche pas les labels car le mot n'est plus courant
                                         self.parent().shouldShowLabels = False
                                         self.parent().hideLabels()
                                         self.clear()

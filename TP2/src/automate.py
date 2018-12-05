@@ -62,7 +62,6 @@ class Automate:
             self.addWithoutUpdate(char)
         self.setLastWord(lettres)
         return self.currentState.words
-
     def addWithoutUpdate(self, char):
         self.currentState = self.currentState.getState(char)
 
