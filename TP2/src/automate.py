@@ -17,13 +17,14 @@ class Automate:
         for i in f:  # pour chaque ligne
             self.currentState = self.origin  # on revient au point de départ à chaque nouveau mot
             for j in i:  # pour chaque caractère
-                if j is not "\n":
-                    self.currentState.fill(j)  # regarde si l'enfant est deja present et le rajoute s'il ne l'est pas
-                    self.currentState = self.currentState.getState(j)
-                else:  # si c'est la fin du mot
-                    self.currentState.makeTerminal()
-                    word = i[:-1]
-                    self.currentState.addWord(word)  # ajoute le mot au current state et à tous ses parents
+                if self.isAlphanumerical(j):
+                    if j is not "\n":
+                        self.currentState.fill(j)  # regarde si l'enfant est deja present et le rajoute s'il ne l'est pas
+                        self.currentState = self.currentState.getState(j)
+                    else:  # si c'est la fin du mot
+                        self.currentState.makeTerminal()
+                        word = i[:-1]
+                        self.currentState.addWord(word)  # ajoute le mot au current state et à tous ses parents
         self.currentState = self.origin
 
 
@@ -40,6 +41,7 @@ class Automate:
             self.add(char,isLastChar)
             i += 1 
         self.setLastWord(lettres)
+
         return self.currentState.words
 
     def add(self, char, isLastChar):
@@ -107,4 +109,11 @@ class Automate:
         if (word == self.lastWord):
             return True
         else: 
+            return False
+
+    def isAlphanumerical(self, char):
+        index = ord(char) - 97
+        if 155 > index >= 0 or index == -58 or index == 242 or char == "\n":
+            return True
+        else:
             return False
