@@ -46,7 +46,7 @@ class Automate:
 
     def add(self, char, isLastChar):
         self.currentState = self.currentState.getState(char)
-        if self.currentState.isTerminal() and not self.isLastWord(self.currentState.words[0]) and isLastChar:        
+        if self.currentState.isTerminal() and isLastChar:        
                 self.currentState.addTimesUsed()
                 if self.fiveLast.full():  # si la queue est pleine enleve le premier
                     temp = self.fiveLast.get(False)  # récupere le mot et indique qu'il n'est plus dans les 5 derniers
@@ -54,7 +54,6 @@ class Automate:
                 self.fiveLast.put_nowait(self.currentState)
                 self.currentState.makeLastFive()
         if self.currentState == 0:
-
             print("Attention le mot que vous tapez n'existe pas dans le lexique")
 
     def findWordsWithoutUpdate(self, lettres):

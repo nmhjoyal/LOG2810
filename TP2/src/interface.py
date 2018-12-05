@@ -8,6 +8,11 @@ import re
 
 charFin = [" ", ",", ":", ";"]
 
+#############################################################################
+## COMME IL EST IMPOSSIBLE DE REMETTRE UN FICHIER .EXE DANS NOTRE ARCHIVE, ##
+# POUR QUE L'INTERFACE FONCTIONNE, INSTALLER PYQT5                          #
+#############################################################################
+
 class Interface(QtWidgets.QMainWindow):
 
         def __init__(self):
@@ -146,7 +151,7 @@ class Interface(QtWidgets.QMainWindow):
         #Choisit s'il faut que les labels soient ajoutés ou retirés
         def handleLabelCheckBox(self):
                 labels = self.automate.getLabel()
-                if self.checkShowLabels.isChecked() and labels[0] != 0 and self.shouldShowLabels:
+                if self.checkShowLabels.isChecked() and self.shouldShowLabels:
                         self.showLabels()
                 else:
                         self.hideLabels()
@@ -194,7 +199,6 @@ class MyTextEdit(QtWidgets.QTextEdit):
                 texte = self.parent().textbox.text()      
                 mots = re.findall(r"[\w']+",texte) #OBTIENT UN TABLEAU DE TOUS LES MOTS
   
-                
                 #On vide textarea avant de réajouter tous les mots
                 self.clear()
                 #S'il n'y a aucune possibilité de mot, alors on affiche un message incitant à écrire
@@ -207,12 +211,21 @@ class MyTextEdit(QtWidgets.QTextEdit):
                                 motCourant =  mots[len(mots)-1]    #OBTIENT LE DERNIER MOT ENTRÉ
                                 dernierChar = texte[len(texte)-1]
                                 automate = self.parent().automate
-                                if key == 16777219 or key == 16777223: #Si backspace, on n'ajoute pas au label
+                                if key != 16777220: #Si backspace, on n'ajoute pas au label
                                         lexique = automate.findWordsWithoutUpdate(motCourant)
+                                        print(lexique[0])
+                                        print(motCourant)
+                                        if (lexique[0] == motCourant): #Si le motCourant est un mot dans le lexique, 
+                                                self.parent().shouldShowLabels = True
+                                                self.parent().handleLabelCheckBox()
+                                        else:
+                                                self.parent().shouldShowLabels = False
                                 else:
                                         lexique = automate.findWords(motCourant)
                                 for i in lexique:
                                         self.insertPlainText(i + "\n")
+                                
+                                #Determine si les caractères qui annoncent la fin d'un mot sont présent
                                 if (dernierChar in charFin):
                                         self.parent().shouldShowLabels = False
                                         self.parent().hideLabels()
