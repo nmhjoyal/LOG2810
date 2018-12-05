@@ -193,8 +193,7 @@ class MyTextEdit(QtWidgets.QTextEdit):
                 self.parent().shouldShowLabels = True
                 texte = self.parent().textbox.text()      
                 mots = re.findall(r"[\w']+",texte) #OBTIENT UN TABLEAU DE TOUS LES MOTS
-                motCourant =  mots[len(mots)-1]    #OBTIENT LE DERNIER MOT ENTRÉ
-                dernierChar = texte[len(texte)-1]
+  
                 
                 #On vide textarea avant de réajouter tous les mots
                 self.clear()
@@ -205,6 +204,8 @@ class MyTextEdit(QtWidgets.QTextEdit):
                 #S'il y a possibilité de mot, on essaie
                 else:
                         try:
+                                motCourant =  mots[len(mots)-1]    #OBTIENT LE DERNIER MOT ENTRÉ
+                                dernierChar = texte[len(texte)-1]
                                 automate = self.parent().automate
                                 if key == 16777219 or key == 16777223: #Si backspace, on n'ajoute pas au label
                                         lexique = automate.findWordsWithoutUpdate(motCourant)
